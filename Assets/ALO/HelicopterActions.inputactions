@@ -20,6 +20,14 @@
                     "expectedControlType": "Stick",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "Paddle",
+                    "type": "PassThrough",
+                    "id": "5429b285-67a3-4c32-acf0-38b47b705d91",
+                    "expectedControlType": "Stick",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -86,6 +94,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "Cyclic",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "e8b77558-a8f1-4053-bafd-19cb4dc7c200",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Paddle",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "7e65ea8f-608f-4bef-b1a9-9faf7e5d6560",
+                    "path": "<Gamepad>/rightStick/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Paddle",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "6a5c0da4-8fbe-4acb-9a0d-865936f78583",
+                    "path": "<Gamepad>/rightStick/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Paddle",
                     "isComposite": false,
                     "isPartOfComposite": true
                 }

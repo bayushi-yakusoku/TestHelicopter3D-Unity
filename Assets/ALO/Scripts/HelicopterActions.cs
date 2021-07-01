@@ -33,6 +33,14 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Stick"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Paddle"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""5429b285-67a3-4c32-acf0-38b47b705d91"",
+                    ""expectedControlType"": ""Stick"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -101,6 +109,39 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                     ""action"": ""Cyclic"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""e8b77558-a8f1-4053-bafd-19cb4dc7c200"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Paddle"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""7e65ea8f-608f-4bef-b1a9-9faf7e5d6560"",
+                    ""path"": ""<Gamepad>/rightStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Paddle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""6a5c0da4-8fbe-4acb-9a0d-865936f78583"",
+                    ""path"": ""<Gamepad>/rightStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Paddle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -111,6 +152,7 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
         m_Default = asset.FindActionMap("Default", throwIfNotFound: true);
         m_Default_Collective = m_Default.FindAction("Collective", throwIfNotFound: true);
         m_Default_Cyclic = m_Default.FindAction("Cyclic", throwIfNotFound: true);
+        m_Default_Paddle = m_Default.FindAction("Paddle", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -162,12 +204,14 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
     private IDefaultActions m_DefaultActionsCallbackInterface;
     private readonly InputAction m_Default_Collective;
     private readonly InputAction m_Default_Cyclic;
+    private readonly InputAction m_Default_Paddle;
     public struct DefaultActions
     {
         private @HelicopterActions m_Wrapper;
         public DefaultActions(@HelicopterActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Collective => m_Wrapper.m_Default_Collective;
         public InputAction @Cyclic => m_Wrapper.m_Default_Cyclic;
+        public InputAction @Paddle => m_Wrapper.m_Default_Paddle;
         public InputActionMap Get() { return m_Wrapper.m_Default; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -183,6 +227,9 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                 @Cyclic.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnCyclic;
                 @Cyclic.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnCyclic;
                 @Cyclic.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnCyclic;
+                @Paddle.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPaddle;
+                @Paddle.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPaddle;
+                @Paddle.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPaddle;
             }
             m_Wrapper.m_DefaultActionsCallbackInterface = instance;
             if (instance != null)
@@ -193,6 +240,9 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                 @Cyclic.started += instance.OnCyclic;
                 @Cyclic.performed += instance.OnCyclic;
                 @Cyclic.canceled += instance.OnCyclic;
+                @Paddle.started += instance.OnPaddle;
+                @Paddle.performed += instance.OnPaddle;
+                @Paddle.canceled += instance.OnPaddle;
             }
         }
     }
@@ -201,5 +251,6 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
     {
         void OnCollective(InputAction.CallbackContext context);
         void OnCyclic(InputAction.CallbackContext context);
+        void OnPaddle(InputAction.CallbackContext context);
     }
 }

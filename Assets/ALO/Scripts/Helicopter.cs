@@ -5,11 +5,13 @@ using UnityEngine.InputSystem;
 
 public class Helicopter : MonoBehaviour
 {
-    [SerializeField] private float collective;
-    [SerializeField] private float cyclic;
+    [SerializeField] private float collectiveModifier;
+    [SerializeField] private float cyclicModifier;
+    [SerializeField] private float paddleModifier;
 
-    private float collectiveForce;
-    private Vector3 direction;
+    private float collective;
+    private Vector3 cyclic;
+    private float paddle;
 
     private HelicopterActions inputActions;
     private Rigidbody rigidBody;
@@ -25,27 +27,42 @@ public class Helicopter : MonoBehaviour
         inputActions.Default.Collective.canceled += CollectiveCanceled;
 
         inputActions.Default.Cyclic.performed += CyclicPerformed;
+
+        inputActions.Default.Paddle.performed += PaddlePerformed;
+        inputActions.Default.Paddle.canceled += PaddleCanceled;
+    }
+
+    private void PaddleCanceled(InputAction.CallbackContext obj)
+    {
+        paddle = 0f;
+    }
+
+    private void PaddlePerformed(InputAction.CallbackContext obj)
+    {
+        paddle = paddleModifier * obj.ReadValue<float>();
+
+        Debug.Log($"Paddle: {paddle}");
     }
 
     private void CyclicPerformed(InputAction.CallbackContext obj)
     {
-        Vector2 wasd = obj.ReadValue<Vector2>();
+        Vector2 wasd = cyclicModifier * obj.ReadValue<Vector2>();
 
-        direction = new Vector3(wasd.y, 0, - wasd.x);
+        cyclic = new Vector3(wasd.y, 0, - wasd.x);
 
-        Debug.Log($"Direction: {direction}");
+        Debug.Log($"Direction: {cyclic}");
     }
 
     private void CollectiveCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        collectiveForce = 0f;
+        collective = 0f;
     }
 
     private void CollectivePerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         float force = obj.ReadValue<float>();
 
-        collectiveForce = force * collective;
+        collective = force * collectiveModifier;
     }
 
     // Start is called before the first frame update
@@ -62,7 +79,9 @@ public class Helicopter : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rigidBody.AddRelativeForce(new Vector3(0, collectiveForce, 0));
+        rigidBody.AddRelativeForce(new Vector3(0, collective, 0));
+
+        Vector3 direction = new Vector3(cyclic.x, paddle, cyclic.z);
 
         transform.Rotate(direction);
     }
