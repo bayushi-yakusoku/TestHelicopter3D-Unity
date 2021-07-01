@@ -41,6 +41,14 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Stick"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""BackTurn"",
+                    ""type"": ""Button"",
+                    ""id"": ""fcb8e09c-69cf-4e68-92c8-16abcac1c7a0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -142,6 +150,17 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                     ""action"": ""Paddle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""62a2f9cc-a672-46ae-98e4-9e79e5fda017"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BackTurn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -153,6 +172,7 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
         m_Default_Collective = m_Default.FindAction("Collective", throwIfNotFound: true);
         m_Default_Cyclic = m_Default.FindAction("Cyclic", throwIfNotFound: true);
         m_Default_Paddle = m_Default.FindAction("Paddle", throwIfNotFound: true);
+        m_Default_BackTurn = m_Default.FindAction("BackTurn", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -205,6 +225,7 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
     private readonly InputAction m_Default_Collective;
     private readonly InputAction m_Default_Cyclic;
     private readonly InputAction m_Default_Paddle;
+    private readonly InputAction m_Default_BackTurn;
     public struct DefaultActions
     {
         private @HelicopterActions m_Wrapper;
@@ -212,6 +233,7 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
         public InputAction @Collective => m_Wrapper.m_Default_Collective;
         public InputAction @Cyclic => m_Wrapper.m_Default_Cyclic;
         public InputAction @Paddle => m_Wrapper.m_Default_Paddle;
+        public InputAction @BackTurn => m_Wrapper.m_Default_BackTurn;
         public InputActionMap Get() { return m_Wrapper.m_Default; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -230,6 +252,9 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                 @Paddle.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPaddle;
                 @Paddle.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPaddle;
                 @Paddle.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPaddle;
+                @BackTurn.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnBackTurn;
+                @BackTurn.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnBackTurn;
+                @BackTurn.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnBackTurn;
             }
             m_Wrapper.m_DefaultActionsCallbackInterface = instance;
             if (instance != null)
@@ -243,6 +268,9 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                 @Paddle.started += instance.OnPaddle;
                 @Paddle.performed += instance.OnPaddle;
                 @Paddle.canceled += instance.OnPaddle;
+                @BackTurn.started += instance.OnBackTurn;
+                @BackTurn.performed += instance.OnBackTurn;
+                @BackTurn.canceled += instance.OnBackTurn;
             }
         }
     }
@@ -252,5 +280,6 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
         void OnCollective(InputAction.CallbackContext context);
         void OnCyclic(InputAction.CallbackContext context);
         void OnPaddle(InputAction.CallbackContext context);
+        void OnBackTurn(InputAction.CallbackContext context);
     }
 }
