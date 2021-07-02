@@ -49,7 +49,7 @@ public class Helicopter : MonoBehaviour
         countdownFrameBackTurn = (int) (backTurnAngle / backTurnSpeed) + 2;
         //inputAccepted = false;
 
-        Debug.Log($"Bacturn Target: {aimForBackTurn}");
+        //Debug.Log($"Bacturn Target: {aimForBackTurn}");
     }
 
     private void PaddleCanceled(InputAction.CallbackContext obj)
@@ -65,7 +65,7 @@ public class Helicopter : MonoBehaviour
 
         paddle = paddleModifier * obj.ReadValue<float>();
 
-        Debug.Log($"Paddle: {paddle}");
+        //Debug.Log($"Paddle: {paddle}");
     }
 
     private void CyclicPerformed(InputAction.CallbackContext obj)
@@ -78,7 +78,7 @@ public class Helicopter : MonoBehaviour
 
         cyclic = new Vector3(wasd.y, 0, - wasd.x);
 
-        Debug.Log($"Direction: {cyclic}");
+        //Debug.Log($"Direction: {cyclic}");
     }
 
     private void CollectiveCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -135,11 +135,15 @@ public class Helicopter : MonoBehaviour
 
     private void BackTurn()
     {
-        if (!backTurnInProgress) return;
+        if (!backTurnInProgress) return;        
 
-        if (countdownFrameBackTurn < 0)
+        float currentAngle = transform.eulerAngles.y;
+        float deltaAngle = aimForBackTurn - currentAngle;
+
+        if (countdownFrameBackTurn < 0 || 
+            Mathf.Approximately(currentAngle, aimForBackTurn))
         {
-            Debug.Log($"Backturn Canceled: CountDown: {countdownFrameBackTurn}");
+            Debug.Log($"Backturn Halted: CountDown: {countdownFrameBackTurn}");
             backTurnInProgress = false;
             inputAccepted = true;
             paddle = 0;
@@ -148,18 +152,6 @@ public class Helicopter : MonoBehaviour
         }
 
         countdownFrameBackTurn--;
-
-        float currentAngle = transform.eulerAngles.y;
-        float deltaAngle = aimForBackTurn - currentAngle;
-
-        if (Mathf.Approximately(currentAngle, aimForBackTurn))
-        {
-            backTurnInProgress = false;
-            inputAccepted = true;
-            paddle = 0;
-
-            return;
-        }
 
         if (Mathf.Abs(deltaAngle) < backTurnSpeed)
         {
