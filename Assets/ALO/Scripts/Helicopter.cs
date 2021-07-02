@@ -19,6 +19,8 @@ public class Helicopter : MonoBehaviour
 
     private bool inputAccepted = true;
     private bool backTurnInProgress = false;
+    private float backTurnAngle = 180;
+    private int countdownFrameBackTurn;
 
     private void Awake()
     {
@@ -42,9 +44,10 @@ public class Helicopter : MonoBehaviour
     {
         if (!inputAccepted) return;
 
-        aimForBackTurn = (transform.localRotation.eulerAngles.y + 180) % 360;
+        aimForBackTurn = (transform.localRotation.eulerAngles.y + backTurnAngle) % 360;
         backTurnInProgress = true;
-        inputAccepted = false;
+        countdownFrameBackTurn = (int) (backTurnAngle / backTurnSpeed) + 2;
+        //inputAccepted = false;
 
         Debug.Log($"Bacturn Target: {aimForBackTurn}");
     }
@@ -58,6 +61,8 @@ public class Helicopter : MonoBehaviour
     {
         if (!inputAccepted) return;
 
+        //backTurnInProgress = false;
+
         paddle = paddleModifier * obj.ReadValue<float>();
 
         Debug.Log($"Paddle: {paddle}");
@@ -66,6 +71,8 @@ public class Helicopter : MonoBehaviour
     private void CyclicPerformed(InputAction.CallbackContext obj)
     {
         if (!inputAccepted) return;
+
+        //backTurnInProgress = false;
 
         Vector2 wasd = cyclicModifier * obj.ReadValue<Vector2>();
 
@@ -82,6 +89,8 @@ public class Helicopter : MonoBehaviour
     private void CollectivePerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if (! inputAccepted) return;
+
+        //backTurnInProgress = false;
 
         float force = obj.ReadValue<float>();
 
@@ -126,7 +135,19 @@ public class Helicopter : MonoBehaviour
 
     private void BackTurn()
     {
-        if (! backTurnInProgress) return;
+        if (!backTurnInProgress) return;
+
+        if (countdownFrameBackTurn < 0)
+        {
+            Debug.Log($"Backturn Canceled: CountDown: {countdownFrameBackTurn}");
+            backTurnInProgress = false;
+            inputAccepted = true;
+            paddle = 0;
+
+            return;
+        }
+
+        countdownFrameBackTurn--;
 
         float currentAngle = transform.eulerAngles.y;
         float deltaAngle = aimForBackTurn - currentAngle;
@@ -140,7 +161,7 @@ public class Helicopter : MonoBehaviour
             return;
         }
 
-        if (deltaAngle < backTurnSpeed)
+        if (Mathf.Abs(deltaAngle) < backTurnSpeed)
         {
             paddle = deltaAngle;
             Debug.Log($"Delta: {deltaAngle}");
