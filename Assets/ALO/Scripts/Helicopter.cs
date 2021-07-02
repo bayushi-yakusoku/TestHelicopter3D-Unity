@@ -9,6 +9,7 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private float cyclicModifier;
     [SerializeField] private float paddleModifier;
     [SerializeField] private float backTurnSpeed;
+    [SerializeField] private float backTurnAngle;
     [SerializeField] private RotorSpeed rotorSpeedModifier;
 
     [Space(10)]
@@ -24,7 +25,7 @@ public class Helicopter : MonoBehaviour
 
     private bool inputAccepted = true;
     private bool backTurnInProgress = false;
-    private float backTurnAngle = 180;
+    
     private int countdownFrameBackTurn;
 
     private bool engineOn = false;

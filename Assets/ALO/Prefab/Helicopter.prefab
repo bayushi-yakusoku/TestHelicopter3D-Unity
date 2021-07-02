@@ -82,8 +82,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collectiveModifier: 250
-  cyclicModifier: 10
-  paddleModifier: 10
+  cyclicModifier: 5
+  paddleModifier: 3
+  backTurnSpeed: 20
+  backTurnAngle: 180
+  rotorSpeedModifier:
+    multiplicator: 2
+    min: 0
+    max: 100
+  runTimeInfo:
+    collective: 0
+    cyclic: {x: 0, y: 0, z: 0}
+    paddle: 0
+    engineOn: 0
+    rotorSpeed: 0
+    backTurnInProgress: 0
+    aimForBackTurn: 0
+    inputAccepted: 0
 --- !u!114 &1921259556707642285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,6 +136,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 5429b285-67a3-4c32-acf0-38b47b705d91
     m_ActionName: Default/Paddle[/XInputControllerWindows/rightStick/left,/XInputControllerWindows/rightStick/right]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: fcb8e09c-69cf-4e68-92c8-16abcac1c7a0
+    m_ActionName: Default/BackTurn[/XInputControllerWindows/rightShoulder]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 98eba0ac-b919-43a5-a803-05b03c7aac64
+    m_ActionName: Default/EnginePowerSwitch[/XInputControllerWindows/leftShoulder]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 91f3bcaa-fad0-41a3-be49-20632ac06f1f
+    m_ActionName: Default/RotorSpeed[/XInputControllerWindows/rightStick/down,/XInputControllerWindows/rightStick/up]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 0002d9f6-b5d3-4dda-89c8-303eb877ee8c
+    m_ActionName: Default/Respawn[/XInputControllerWindows/buttonEast]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Default
