@@ -10,6 +10,9 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private float paddleModifier;
     [SerializeField] private float backTurnSpeed;
 
+    [Space(10)]
+    [SerializeField] private HelicopterInfo runTimeInfo;
+
     private float collective;
     private Vector3 cyclic;
     private float paddle;
@@ -47,9 +50,7 @@ public class Helicopter : MonoBehaviour
         aimForBackTurn = (transform.localRotation.eulerAngles.y + backTurnAngle) % 360;
         backTurnInProgress = true;
         countdownFrameBackTurn = (int) (backTurnAngle / backTurnSpeed) + 2;
-        //inputAccepted = false;
-
-        //Debug.Log($"Bacturn Target: {aimForBackTurn}");
+        inputAccepted = false;
     }
 
     private void PaddleCanceled(InputAction.CallbackContext obj)
@@ -61,24 +62,16 @@ public class Helicopter : MonoBehaviour
     {
         if (!inputAccepted) return;
 
-        //backTurnInProgress = false;
-
         paddle = paddleModifier * obj.ReadValue<float>();
-
-        //Debug.Log($"Paddle: {paddle}");
     }
 
     private void CyclicPerformed(InputAction.CallbackContext obj)
     {
         if (!inputAccepted) return;
 
-        //backTurnInProgress = false;
-
         Vector2 wasd = cyclicModifier * obj.ReadValue<Vector2>();
 
         cyclic = new Vector3(wasd.y, 0, - wasd.x);
-
-        //Debug.Log($"Direction: {cyclic}");
     }
 
     private void CollectiveCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -89,8 +82,6 @@ public class Helicopter : MonoBehaviour
     private void CollectivePerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if (! inputAccepted) return;
-
-        //backTurnInProgress = false;
 
         float force = obj.ReadValue<float>();
 
@@ -106,7 +97,7 @@ public class Helicopter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        UpdateInfo();
     }
 
     private void FixedUpdate()
@@ -162,4 +153,26 @@ public class Helicopter : MonoBehaviour
             paddle = backTurnSpeed;
 
     }
+
+    private void UpdateInfo()
+    {
+        runTimeInfo.cyclic = cyclic;
+        runTimeInfo.collective = collective;
+        runTimeInfo.paddle = paddle;
+        runTimeInfo.backTurnInProgress = backTurnInProgress;
+        runTimeInfo.aimForBackTurn = aimForBackTurn;
+        runTimeInfo.inputAccepted = inputAccepted;
+    }
+}
+
+[System.Serializable]
+class HelicopterInfo
+{
+    [ReadOnly] public float collective;
+    [ReadOnly] public Vector3 cyclic;
+    [ReadOnly] public float paddle;
+
+    [ReadOnly] public bool backTurnInProgress;
+    [ReadOnly] public float aimForBackTurn;
+    [ReadOnly] public bool inputAccepted;
 }

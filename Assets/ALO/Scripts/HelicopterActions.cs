@@ -49,6 +49,30 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""EnginePowerSwitch"",
+                    ""type"": ""Button"",
+                    ""id"": ""98eba0ac-b919-43a5-a803-05b03c7aac64"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RotorSpeed"",
+                    ""type"": ""Button"",
+                    ""id"": ""91f3bcaa-fad0-41a3-be49-20632ac06f1f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Respawn"",
+                    ""type"": ""Button"",
+                    ""id"": ""0002d9f6-b5d3-4dda-89c8-303eb877ee8c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -66,7 +90,7 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""2D Vector"",
                     ""id"": ""624753e7-f652-4498-94e1-e1f346fd87cc"",
-                    ""path"": ""2DVector"",
+                    ""path"": ""2DVector(mode=2)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -161,6 +185,61 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                     ""action"": ""BackTurn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1b98f8a2-fce9-4c1b-a769-4001c3055e06"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EnginePowerSwitch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""8884404c-a504-4387-9723-dbb4e6432106"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotorSpeed"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""45fc5348-3ab8-4cc7-9ccd-acf418fb8d60"",
+                    ""path"": ""<Gamepad>/rightStick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotorSpeed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""cd92eeaf-6e2b-4c6d-a500-b11fb666bd0b"",
+                    ""path"": ""<Gamepad>/rightStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotorSpeed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d114a01d-c679-48ba-8f49-5820a971db7d"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Respawn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -173,6 +252,9 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
         m_Default_Cyclic = m_Default.FindAction("Cyclic", throwIfNotFound: true);
         m_Default_Paddle = m_Default.FindAction("Paddle", throwIfNotFound: true);
         m_Default_BackTurn = m_Default.FindAction("BackTurn", throwIfNotFound: true);
+        m_Default_EnginePowerSwitch = m_Default.FindAction("EnginePowerSwitch", throwIfNotFound: true);
+        m_Default_RotorSpeed = m_Default.FindAction("RotorSpeed", throwIfNotFound: true);
+        m_Default_Respawn = m_Default.FindAction("Respawn", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -226,6 +308,9 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
     private readonly InputAction m_Default_Cyclic;
     private readonly InputAction m_Default_Paddle;
     private readonly InputAction m_Default_BackTurn;
+    private readonly InputAction m_Default_EnginePowerSwitch;
+    private readonly InputAction m_Default_RotorSpeed;
+    private readonly InputAction m_Default_Respawn;
     public struct DefaultActions
     {
         private @HelicopterActions m_Wrapper;
@@ -234,6 +319,9 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
         public InputAction @Cyclic => m_Wrapper.m_Default_Cyclic;
         public InputAction @Paddle => m_Wrapper.m_Default_Paddle;
         public InputAction @BackTurn => m_Wrapper.m_Default_BackTurn;
+        public InputAction @EnginePowerSwitch => m_Wrapper.m_Default_EnginePowerSwitch;
+        public InputAction @RotorSpeed => m_Wrapper.m_Default_RotorSpeed;
+        public InputAction @Respawn => m_Wrapper.m_Default_Respawn;
         public InputActionMap Get() { return m_Wrapper.m_Default; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -255,6 +343,15 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                 @BackTurn.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnBackTurn;
                 @BackTurn.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnBackTurn;
                 @BackTurn.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnBackTurn;
+                @EnginePowerSwitch.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnEnginePowerSwitch;
+                @EnginePowerSwitch.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnEnginePowerSwitch;
+                @EnginePowerSwitch.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnEnginePowerSwitch;
+                @RotorSpeed.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnRotorSpeed;
+                @RotorSpeed.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnRotorSpeed;
+                @RotorSpeed.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnRotorSpeed;
+                @Respawn.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnRespawn;
+                @Respawn.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnRespawn;
+                @Respawn.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnRespawn;
             }
             m_Wrapper.m_DefaultActionsCallbackInterface = instance;
             if (instance != null)
@@ -271,6 +368,15 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
                 @BackTurn.started += instance.OnBackTurn;
                 @BackTurn.performed += instance.OnBackTurn;
                 @BackTurn.canceled += instance.OnBackTurn;
+                @EnginePowerSwitch.started += instance.OnEnginePowerSwitch;
+                @EnginePowerSwitch.performed += instance.OnEnginePowerSwitch;
+                @EnginePowerSwitch.canceled += instance.OnEnginePowerSwitch;
+                @RotorSpeed.started += instance.OnRotorSpeed;
+                @RotorSpeed.performed += instance.OnRotorSpeed;
+                @RotorSpeed.canceled += instance.OnRotorSpeed;
+                @Respawn.started += instance.OnRespawn;
+                @Respawn.performed += instance.OnRespawn;
+                @Respawn.canceled += instance.OnRespawn;
             }
         }
     }
@@ -281,5 +387,8 @@ public class @HelicopterActions : IInputActionCollection, IDisposable
         void OnCyclic(InputAction.CallbackContext context);
         void OnPaddle(InputAction.CallbackContext context);
         void OnBackTurn(InputAction.CallbackContext context);
+        void OnEnginePowerSwitch(InputAction.CallbackContext context);
+        void OnRotorSpeed(InputAction.CallbackContext context);
+        void OnRespawn(InputAction.CallbackContext context);
     }
 }
