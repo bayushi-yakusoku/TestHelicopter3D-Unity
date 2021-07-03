@@ -16,6 +16,9 @@ public class CameraHelicopter : MonoBehaviour
 
     [SerializeField] private float speed;
 
+    [Space(10)]
+    [SerializeField] private CameraHelicopterInfo runTimeInfo;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,7 +34,8 @@ public class CameraHelicopter : MonoBehaviour
     private void FixedUpdate()
     {
         //FollowPerfect();
-        FollowWithDecal();
+        //FollowWithDecal();
+        FollowWithDecalMax();
     }
 
     private void FollowPerfect()
@@ -71,4 +75,82 @@ public class CameraHelicopter : MonoBehaviour
 
         transform.LookAt(helicopter.transform);
     }
+
+    private void FollowWithDecalMax()
+    {
+        Vector3 camTargetPosition = new Vector3(
+            helicopter.transform.position.x + xFar,
+            helicopter.transform.position.y + yFar,
+            helicopter.transform.position.z + zFar);
+
+        Vector3 camDirection = camTargetPosition - transform.position;
+        Vector3 camSpeed = camDirection.normalized * speed;
+        Vector3 camNextPosition = transform.position + camSpeed;
+
+        float distToTargetPosition = camDirection.magnitude;
+
+        camNextPosition = ApplyMaxDecal(camNextPosition, camTargetPosition);
+
+        if (distToTargetPosition <= speed)
+        {
+            Debug.Log($"{distToTargetPosition} <= {speed}: TargetPosition");
+            transform.position = camTargetPosition;
+        }
+        else
+        {
+            Debug.Log($"{distToTargetPosition} <= {speed}: NextPosition");
+            transform.position = camNextPosition;
+        }
+
+        transform.LookAt(helicopter.transform);
+    }
+
+    private Vector3 ApplyMaxDecal(Vector3 nextPosition, Vector3 targetPosition)
+    {
+        Vector3 correctedPosition = nextPosition;
+        
+        // RuntimeInfo Update:
+        runTimeInfo.targetPosition = targetPosition;
+        runTimeInfo.nextPosition = nextPosition;
+
+        // x:
+        float xDistFromNextToTarget = targetPosition.x - nextPosition.x;
+        if (Mathf.Abs(xDistFromNextToTarget) > xDecal)
+        {
+            correctedPosition.x = targetPosition.x - Mathf.Sign(xDistFromNextToTarget) * xDecal;
+        }
+
+        // y:
+        float yDistFromNextToTarget = targetPosition.y - nextPosition.y;
+        if (Mathf.Abs(yDistFromNextToTarget) > yDecal)
+        {
+            correctedPosition .y = targetPosition.y - Mathf.Sign(yDistFromNextToTarget) * yDecal;
+        }
+
+        // z:
+        float zDistFromNextToTarget = targetPosition.z - nextPosition.z;
+        if (Mathf.Abs(zDistFromNextToTarget) > zDecal)
+        {
+            correctedPosition .z = targetPosition.z - Mathf.Sign(zDistFromNextToTarget) * zDecal;
+        }
+
+        // RuntimeInfo Update:
+        runTimeInfo.correctedPosition = correctedPosition;
+        runTimeInfo.xdist = xDistFromNextToTarget;
+        runTimeInfo.ydist = yDistFromNextToTarget;
+        runTimeInfo.zdist = zDistFromNextToTarget;
+
+        return correctedPosition;
+    }
+}
+
+[System.Serializable] 
+class CameraHelicopterInfo
+{
+    [ReadOnly] public Vector3 targetPosition;
+    [ReadOnly] public Vector3 nextPosition;
+    [ReadOnly] public Vector3 correctedPosition;
+    [ReadOnly] public float xdist;
+    [ReadOnly] public float ydist;
+    [ReadOnly] public float zdist;
 }
