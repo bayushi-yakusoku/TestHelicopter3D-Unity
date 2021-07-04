@@ -31,7 +31,7 @@ public class CameraHelicopter : MonoBehaviour
         
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         //FollowPerfect();
         //FollowWithDecal();
@@ -93,12 +93,12 @@ public class CameraHelicopter : MonoBehaviour
 
         if (distToTargetPosition <= speed)
         {
-            Debug.Log($"{distToTargetPosition} <= {speed}: TargetPosition");
+            Debug.Log($"{distToTargetPosition} <= {speed}: TargetPosition: {camTargetPosition}");
             transform.position = camTargetPosition;
         }
         else
         {
-            Debug.Log($"{distToTargetPosition} <= {speed}: NextPosition");
+            Debug.Log($"{distToTargetPosition} <= {speed}: NextPosition: {camNextPosition}");
             transform.position = camNextPosition;
         }
 
@@ -124,21 +124,24 @@ public class CameraHelicopter : MonoBehaviour
         float yDistFromNextToTarget = targetPosition.y - nextPosition.y;
         if (Mathf.Abs(yDistFromNextToTarget) > yDecal)
         {
-            correctedPosition .y = targetPosition.y - Mathf.Sign(yDistFromNextToTarget) * yDecal;
+            correctedPosition.y = targetPosition.y - Mathf.Sign(yDistFromNextToTarget) * yDecal;
         }
 
         // z:
         float zDistFromNextToTarget = targetPosition.z - nextPosition.z;
         if (Mathf.Abs(zDistFromNextToTarget) > zDecal)
         {
-            correctedPosition .z = targetPosition.z - Mathf.Sign(zDistFromNextToTarget) * zDecal;
+            correctedPosition.z = targetPosition.z - Mathf.Sign(zDistFromNextToTarget) * zDecal;
         }
 
         // RuntimeInfo Update:
         runTimeInfo.correctedPosition = correctedPosition;
-        runTimeInfo.xdist = xDistFromNextToTarget;
-        runTimeInfo.ydist = yDistFromNextToTarget;
-        runTimeInfo.zdist = zDistFromNextToTarget;
+        runTimeInfo.xdistNextPos = xDistFromNextToTarget;
+        runTimeInfo.xdistCorrPos = Mathf.Abs(targetPosition.x - correctedPosition.x);
+        runTimeInfo.ydistNextPos = yDistFromNextToTarget;
+        runTimeInfo.ydistCorrPos = Mathf.Abs(targetPosition.y - correctedPosition.y);
+        runTimeInfo.zdistNextPos = zDistFromNextToTarget;
+        runTimeInfo.zdistCorrPos = Mathf.Abs(targetPosition.z - correctedPosition.z);
 
         return correctedPosition;
     }
@@ -150,7 +153,10 @@ class CameraHelicopterInfo
     [ReadOnly] public Vector3 targetPosition;
     [ReadOnly] public Vector3 nextPosition;
     [ReadOnly] public Vector3 correctedPosition;
-    [ReadOnly] public float xdist;
-    [ReadOnly] public float ydist;
-    [ReadOnly] public float zdist;
+    [ReadOnly] public float xdistNextPos;
+    [ReadOnly] public float xdistCorrPos;
+    [ReadOnly] public float ydistNextPos;
+    [ReadOnly] public float ydistCorrPos;
+    [ReadOnly] public float zdistNextPos;
+    [ReadOnly] public float zdistCorrPos;
 }
