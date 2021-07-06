@@ -12,10 +12,10 @@ enum FollowCamsModel
     FollowingWithSmoothDamp
 };
 
-public class CameraHelicopter : MonoBehaviour
+public class FollowTarget : MonoBehaviour
 {
 
-    [SerializeField] private GameObject helicopter;
+    [SerializeField] private Transform target;
 
     [Space(10)]
     [SerializeField] FollowCamsModel camsModel;
@@ -23,15 +23,17 @@ public class CameraHelicopter : MonoBehaviour
     [Space(10)]
     [SerializeField] private Vector3 offset;
 
-    [SerializeField] private float xDecal;
-    [SerializeField] private float yDecal;
-    [SerializeField] private float zDecal;
+    [SerializeField] private Vector3 maxDecal;
 
     [SerializeField] private float speed;
-    [SerializeField] private float smoothSpeed = 0.125f;
+    [SerializeField] private float smoothSpeed;
+
+    [SerializeField] private float smoothTime;
 
     [Space(10)]
     [SerializeField] private CameraHelicopterInfo runTimeInfo;
+
+    private Vector3 camTargetPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -54,6 +56,9 @@ public class CameraHelicopter : MonoBehaviour
     private void LateUpdate()
     {
 
+        camTargetPosition = target.position + offset;
+        runTimeInfo.targetPosition = camTargetPosition;
+
         switch(camsModel)
         {
             case FollowCamsModel.FollowPerfect:
@@ -72,20 +77,18 @@ public class CameraHelicopter : MonoBehaviour
                 FollowingWithSmoothDamp();
                 break;
         }
+
+        UpdateRunTimeInfo();
     }
 
     private void FollowPerfect()
     {
-        Vector3 camPosition = helicopter.transform.position + offset;
-
-        transform.position = camPosition;
-        transform.LookAt(helicopter.transform);
+        transform.position = camTargetPosition;
+        transform.LookAt(target);
     }
 
     private void FollowWithDecal()
     {
-        Vector3 camTargetPosition = helicopter.transform.position + offset;
-
         Vector3 camDirection = camTargetPosition - transform.position;
         Vector3 camSpeed = camDirection.normalized * speed;
         Vector3 camNextPosition = transform.position + camSpeed;
@@ -94,61 +97,49 @@ public class CameraHelicopter : MonoBehaviour
 
         if (dist <= speed)
         {
-            Debug.Log($"{dist} <= {speed}: TargetPosition");
+            //Debug.Log($"{dist} <= {speed}: TargetPosition");
             transform.position = camTargetPosition;
         }
         else
         {
-            Debug.Log($"{dist} <= {speed}: NextPosition");
+            //Debug.Log($"{dist} <= {speed}: NextPosition");
             transform.position = camNextPosition;
         }
 
-        transform.LookAt(helicopter.transform);
+        transform.LookAt(target);
     }
     
     private void FollowWithLerp()
     {
-        Vector3 desiredPosition = helicopter.transform.position + offset;
-
         Vector3 smoothedPosition = Vector3.Lerp(
             transform.position, 
-            desiredPosition, 
+            camTargetPosition, 
             smoothSpeed * Time.deltaTime);
 
         transform.position = smoothedPosition;
 
-        transform.LookAt(helicopter.transform);
+        transform.LookAt(target);
     }
 
-    private Vector3 velocity = Vector3.zero;
-
-    [SerializeField] private float smoothTime;
     private void FollowingWithSmoothDamp()
     {
-        
-
-        Vector3 desiredPosition = helicopter.transform.position + offset;
-
-        // Define a target position above and behind the target transform
-        //Vector3 targetPosition = target.TransformPoint(new Vector3(0, 5, -10));
-
         // Smoothly move the camera towards that target position
         transform.position = Vector3.SmoothDamp(
             transform.position, 
-            desiredPosition, 
-            ref velocity, 
+            camTargetPosition, 
+            ref runTimeInfo.velocity, 
             smoothTime);
 
-        transform.LookAt(helicopter.transform);
+        transform.LookAt(target);
     }
 
     private void FollowWithDecalMax()
     {
-        Vector3 camTargetPosition = helicopter.transform.position + offset;
-
         Vector3 camDirection = camTargetPosition - transform.position;
         Vector3 camSpeed = camDirection.normalized * speed;
         Vector3 camNextPosition = transform.position + camSpeed;
+        
+        runTimeInfo.nextPosition = camNextPosition;
 
         float distToTargetPosition = camDirection.magnitude;
 
@@ -156,57 +147,50 @@ public class CameraHelicopter : MonoBehaviour
 
         if (distToTargetPosition <= speed)
         {
-            Debug.Log($"{distToTargetPosition} <= {speed}: TargetPosition: {camTargetPosition}");
+            //Debug.Log($"{distToTargetPosition} <= {speed}: TargetPosition: {camTargetPosition}");
             transform.position = camTargetPosition;
         }
         else
         {
-            Debug.Log($"{distToTargetPosition} <= {speed}: NextPosition: {camNextPosition}");
+            //Debug.Log($"{distToTargetPosition} <= {speed}: NextPosition: {camNextPosition}");
             transform.position = camNextPosition;
         }
 
-        transform.LookAt(helicopter.transform);
+        transform.LookAt(target);
     }
 
     private Vector3 ApplyMaxDecal(Vector3 nextPosition, Vector3 targetPosition)
     {
         Vector3 correctedPosition = nextPosition;
-        
-        // RuntimeInfo Update:
-        runTimeInfo.targetPosition = targetPosition;
-        runTimeInfo.nextPosition = nextPosition;
 
         // x:
         float xDistFromNextToTarget = targetPosition.x - nextPosition.x;
-        if (Mathf.Abs(xDistFromNextToTarget) > xDecal)
+        if (Mathf.Abs(xDistFromNextToTarget) > maxDecal.x)
         {
-            correctedPosition.x = targetPosition.x - Mathf.Sign(xDistFromNextToTarget) * xDecal;
+            correctedPosition.x = targetPosition.x - Mathf.Sign(xDistFromNextToTarget) * maxDecal.x;
         }
 
         // y:
         float yDistFromNextToTarget = targetPosition.y - nextPosition.y;
-        if (Mathf.Abs(yDistFromNextToTarget) > yDecal)
+        if (Mathf.Abs(yDistFromNextToTarget) > maxDecal.y)
         {
-            correctedPosition.y = targetPosition.y - Mathf.Sign(yDistFromNextToTarget) * yDecal;
+            correctedPosition.y = targetPosition.y - Mathf.Sign(yDistFromNextToTarget) * maxDecal.y;
         }
 
         // z:
         float zDistFromNextToTarget = targetPosition.z - nextPosition.z;
-        if (Mathf.Abs(zDistFromNextToTarget) > zDecal)
+        if (Mathf.Abs(zDistFromNextToTarget) > maxDecal.z)
         {
-            correctedPosition.z = targetPosition.z - Mathf.Sign(zDistFromNextToTarget) * zDecal;
+            correctedPosition.z = targetPosition.z - Mathf.Sign(zDistFromNextToTarget) * maxDecal.z;
         }
 
-        // RuntimeInfo Update:
-        runTimeInfo.correctedPosition = correctedPosition;
-        runTimeInfo.xdistNextPos = xDistFromNextToTarget;
-        runTimeInfo.xdistCorrPos = Mathf.Abs(targetPosition.x - correctedPosition.x);
-        runTimeInfo.ydistNextPos = yDistFromNextToTarget;
-        runTimeInfo.ydistCorrPos = Mathf.Abs(targetPosition.y - correctedPosition.y);
-        runTimeInfo.zdistNextPos = zDistFromNextToTarget;
-        runTimeInfo.zdistCorrPos = Mathf.Abs(targetPosition.z - correctedPosition.z);
-
         return correctedPosition;
+    }
+
+    private void UpdateRunTimeInfo()
+    {
+        runTimeInfo.correctedPosition = transform.position;
+        runTimeInfo.decalFromTarget = runTimeInfo.targetPosition - runTimeInfo.correctedPosition;
     }
 }
 
@@ -216,10 +200,6 @@ class CameraHelicopterInfo
     [ReadOnly] public Vector3 targetPosition;
     [ReadOnly] public Vector3 nextPosition;
     [ReadOnly] public Vector3 correctedPosition;
-    [ReadOnly] public float xdistNextPos;
-    [ReadOnly] public float xdistCorrPos;
-    [ReadOnly] public float ydistNextPos;
-    [ReadOnly] public float ydistCorrPos;
-    [ReadOnly] public float zdistNextPos;
-    [ReadOnly] public float zdistCorrPos;
+    [ReadOnly] public Vector3 decalFromTarget;
+    [ReadOnly] public Vector3 velocity;
 }

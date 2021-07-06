@@ -86,6 +86,7 @@ public class Helicopter : MonoBehaviour
     {
         engineOn = (engineOn == false);
 
+        Debug.Log($"Engine On: {engineOn}");
         animator.SetBool("EngineOn", engineOn);
     }
 
