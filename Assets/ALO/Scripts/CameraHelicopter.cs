@@ -2,19 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+enum FollowCamsModel
+{
+    FollowPerfect,
+    FollowWithDecal,
+    FollowWithDecalMax,
+    FollowWithLerp,
+    FollowingWithSmoothDamp
+};
+
 public class CameraHelicopter : MonoBehaviour
 {
 
     [SerializeField] private GameObject helicopter;
-    [SerializeField] private float xFar;
-    [SerializeField] private float yFar;
-    [SerializeField] private float zFar;
+
+    [Space(10)]
+    [SerializeField] FollowCamsModel camsModel;
+
+    [Space(10)]
+    [SerializeField] private Vector3 offset;
 
     [SerializeField] private float xDecal;
     [SerializeField] private float yDecal;
     [SerializeField] private float zDecal;
 
     [SerializeField] private float speed;
+    [SerializeField] private float smoothSpeed = 0.125f;
 
     [Space(10)]
     [SerializeField] private CameraHelicopterInfo runTimeInfo;
@@ -25,6 +39,12 @@ public class CameraHelicopter : MonoBehaviour
         
     }
 
+
+    private void FixedUpdate()
+    {
+        //FollowWithLerp();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -33,17 +53,30 @@ public class CameraHelicopter : MonoBehaviour
 
     private void LateUpdate()
     {
-        //FollowPerfect();
-        //FollowWithDecal();
-        FollowWithDecalMax();
+
+        switch(camsModel)
+        {
+            case FollowCamsModel.FollowPerfect:
+                FollowPerfect();
+                break;
+            case FollowCamsModel.FollowWithDecal:
+                FollowWithDecal();
+                break;
+            case FollowCamsModel.FollowWithDecalMax:
+                FollowWithDecalMax();
+                break;
+            case FollowCamsModel.FollowWithLerp:
+                FollowWithLerp();
+                break;
+            case FollowCamsModel.FollowingWithSmoothDamp:
+                FollowingWithSmoothDamp();
+                break;
+        }
     }
 
     private void FollowPerfect()
     {
-        Vector3 camPosition = helicopter.transform.position;
-        camPosition.x += xFar;
-        camPosition.y += yFar;
-        camPosition.z += zFar;
+        Vector3 camPosition = helicopter.transform.position + offset;
 
         transform.position = camPosition;
         transform.LookAt(helicopter.transform);
@@ -51,10 +84,7 @@ public class CameraHelicopter : MonoBehaviour
 
     private void FollowWithDecal()
     {
-        Vector3 camTargetPosition = new Vector3(
-            helicopter.transform.position.x + xFar,
-            helicopter.transform.position.y + yFar,
-            helicopter.transform.position.z + zFar);
+        Vector3 camTargetPosition = helicopter.transform.position + offset;
 
         Vector3 camDirection = camTargetPosition - transform.position;
         Vector3 camSpeed = camDirection.normalized * speed;
@@ -75,13 +105,46 @@ public class CameraHelicopter : MonoBehaviour
 
         transform.LookAt(helicopter.transform);
     }
+    
+    private void FollowWithLerp()
+    {
+        Vector3 desiredPosition = helicopter.transform.position + offset;
+
+        Vector3 smoothedPosition = Vector3.Lerp(
+            transform.position, 
+            desiredPosition, 
+            smoothSpeed * Time.deltaTime);
+
+        transform.position = smoothedPosition;
+
+        transform.LookAt(helicopter.transform);
+    }
+
+    private Vector3 velocity = Vector3.zero;
+
+    [SerializeField] private float smoothTime;
+    private void FollowingWithSmoothDamp()
+    {
+        
+
+        Vector3 desiredPosition = helicopter.transform.position + offset;
+
+        // Define a target position above and behind the target transform
+        //Vector3 targetPosition = target.TransformPoint(new Vector3(0, 5, -10));
+
+        // Smoothly move the camera towards that target position
+        transform.position = Vector3.SmoothDamp(
+            transform.position, 
+            desiredPosition, 
+            ref velocity, 
+            smoothTime);
+
+        transform.LookAt(helicopter.transform);
+    }
 
     private void FollowWithDecalMax()
     {
-        Vector3 camTargetPosition = new Vector3(
-            helicopter.transform.position.x + xFar,
-            helicopter.transform.position.y + yFar,
-            helicopter.transform.position.z + zFar);
+        Vector3 camTargetPosition = helicopter.transform.position + offset;
 
         Vector3 camDirection = camTargetPosition - transform.position;
         Vector3 camSpeed = camDirection.normalized * speed;
