@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2ab3c5a08208a8848ad4061bfeb97792
+guid: 813d8860d62f2fb46af045838fb026c5
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable: []
@@ -7,23 +7,23 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Ground
-    second: {fileID: 2100000, guid: 29f6a1d33a1004840ad51372b3111e5e, type: 2}
+      name: BallJoints
+    second: {fileID: 2100000, guid: ef8b92c665e5e774493cbdd46af21d82, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Net
-    second: {fileID: 2100000, guid: e2ebe81d6e322144a9dc0d0e087a765e, type: 2}
+      name: BallSleeves1
+    second: {fileID: 2100000, guid: 7b30a9d512f55a046806c797de275669, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Poteau
-    second: {fileID: 2100000, guid: 60c9354b25eeac648b3112939f715db9, type: 2}
+      name: BallSleeves2
+    second: {fileID: 2100000, guid: 433d6a7b89d0df94d93bee3729226a5e, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: court
-    second: {fileID: 2100000, guid: 046d1e051bfa9504a81579dc077b1649, type: 2}
+      name: BallSleeves3
+    second: {fileID: 2100000, guid: 77cc67a7f42ece8428a3553b90f47b74, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
