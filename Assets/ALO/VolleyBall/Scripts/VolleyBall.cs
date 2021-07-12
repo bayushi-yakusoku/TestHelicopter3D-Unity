@@ -41,6 +41,14 @@ public class @VolleyBall : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Shoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""eeddcd21-eb1c-4f2a-8fba-5681597f85a6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -120,6 +128,17 @@ public class @VolleyBall : IInputActionCollection, IDisposable
                     ""action"": ""Respawn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1a2eb396-8d8e-4996-99a6-a8050c428def"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -192,6 +211,7 @@ public class @VolleyBall : IInputActionCollection, IDisposable
         m_TestWithBall_Direction = m_TestWithBall.FindAction("Direction", throwIfNotFound: true);
         m_TestWithBall_Hit = m_TestWithBall.FindAction("Hit", throwIfNotFound: true);
         m_TestWithBall_Respawn = m_TestWithBall.FindAction("Respawn", throwIfNotFound: true);
+        m_TestWithBall_Shoot = m_TestWithBall.FindAction("Shoot", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -244,6 +264,7 @@ public class @VolleyBall : IInputActionCollection, IDisposable
     private readonly InputAction m_TestWithBall_Direction;
     private readonly InputAction m_TestWithBall_Hit;
     private readonly InputAction m_TestWithBall_Respawn;
+    private readonly InputAction m_TestWithBall_Shoot;
     public struct TestWithBallActions
     {
         private @VolleyBall m_Wrapper;
@@ -251,6 +272,7 @@ public class @VolleyBall : IInputActionCollection, IDisposable
         public InputAction @Direction => m_Wrapper.m_TestWithBall_Direction;
         public InputAction @Hit => m_Wrapper.m_TestWithBall_Hit;
         public InputAction @Respawn => m_Wrapper.m_TestWithBall_Respawn;
+        public InputAction @Shoot => m_Wrapper.m_TestWithBall_Shoot;
         public InputActionMap Get() { return m_Wrapper.m_TestWithBall; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -269,6 +291,9 @@ public class @VolleyBall : IInputActionCollection, IDisposable
                 @Respawn.started -= m_Wrapper.m_TestWithBallActionsCallbackInterface.OnRespawn;
                 @Respawn.performed -= m_Wrapper.m_TestWithBallActionsCallbackInterface.OnRespawn;
                 @Respawn.canceled -= m_Wrapper.m_TestWithBallActionsCallbackInterface.OnRespawn;
+                @Shoot.started -= m_Wrapper.m_TestWithBallActionsCallbackInterface.OnShoot;
+                @Shoot.performed -= m_Wrapper.m_TestWithBallActionsCallbackInterface.OnShoot;
+                @Shoot.canceled -= m_Wrapper.m_TestWithBallActionsCallbackInterface.OnShoot;
             }
             m_Wrapper.m_TestWithBallActionsCallbackInterface = instance;
             if (instance != null)
@@ -282,6 +307,9 @@ public class @VolleyBall : IInputActionCollection, IDisposable
                 @Respawn.started += instance.OnRespawn;
                 @Respawn.performed += instance.OnRespawn;
                 @Respawn.canceled += instance.OnRespawn;
+                @Shoot.started += instance.OnShoot;
+                @Shoot.performed += instance.OnShoot;
+                @Shoot.canceled += instance.OnShoot;
             }
         }
     }
@@ -336,5 +364,6 @@ public class @VolleyBall : IInputActionCollection, IDisposable
         void OnDirection(InputAction.CallbackContext context);
         void OnHit(InputAction.CallbackContext context);
         void OnRespawn(InputAction.CallbackContext context);
+        void OnShoot(InputAction.CallbackContext context);
     }
 }

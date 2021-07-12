@@ -8,6 +8,11 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private float hitForce;
     [SerializeField] private GameObject arrow;
 
+    [SerializeField] private Transform target;
+    [SerializeField] private float h;
+
+    [SerializeField] private Vector3 myGravity;
+
     private Rigidbody ballRigidBody;
     private BallControl ballControl;
 
@@ -28,12 +33,47 @@ public class PlayerControl : MonoBehaviour
         ballRigidBody = ball.GetComponent<Rigidbody>();
         ballControl = ball.GetComponent<BallControl>();
 
+        InitInputCallBack();
+
+        Physics.gravity = Vector3.zero;
+    }
+
+    private void InitInputCallBack()
+    {
         inputActions.TestWithBall.Respawn.performed += InputRespawnPerformed;
 
         inputActions.TestWithBall.Hit.performed += InputHitPerformed;
 
         inputActions.TestWithBall.Direction.performed += InputDirectionPerformed;
         inputActions.TestWithBall.Direction.canceled += InputDirectionCanceled;
+
+        inputActions.TestWithBall.Shoot.performed += InputShootPerformed;
+    }
+
+    private void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        Debug.Log("Shoot");
+        Physics.gravity = myGravity;
+
+        ballRigidBody.velocity = GetShootVelocity();
+    }
+
+    private Vector3 GetShootVelocity()
+    {
+        float Py = target.position.y - ball.transform.position.y;
+        float Sx = target.position.x - ball.transform.position.x;
+        float g = myGravity.y;
+
+        float Uy = Mathf.Sqrt(-2 * g * h);
+
+        float Ux = Sx / ( Mathf.Sqrt(-2 * h / g) + Mathf.Sqrt(2 * (Py - h) / g) );
+
+        Vector3 velocity = new Vector3(Ux, Uy, 0);
+
+        Debug.Log($"Velocity: {velocity}");
+
+        return velocity;
+
     }
 
     private void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -69,19 +109,23 @@ public class PlayerControl : MonoBehaviour
     private void InputHitPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Hit!");
+        Physics.gravity = myGravity;
+
         ballRigidBody.AddForce(direction * hitForce);
     }
 
     private void InputRespawnPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Respawn");
+
+        Physics.gravity = Vector3.zero;
         ballControl.Respawn();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        Debug.DrawLine(ball.transform.position, target.position);
     }
 
     private void OnEnable()
@@ -93,6 +137,5 @@ public class PlayerControl : MonoBehaviour
     {
         inputActions.Disable();
     }
-
 
 }
