@@ -4,29 +4,36 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    [SerializeField] private GameObject ball;
-    [SerializeField] private float hitForce;
-    [SerializeField] private GameObject arrow;
+    [SerializeField] GameObject ball;
+    [SerializeField] float hitForce;
+    [SerializeField] GameObject arrow;
 
-    [SerializeField] private Transform target;
-    [SerializeField] private float h;
+    [SerializeField] Transform target;
+    [SerializeField] float h;
 
-    [SerializeField] private Vector3 myGravity;
+    [SerializeField] float g;
+    Vector3 myGravity;
 
-    private Rigidbody ballRigidBody;
-    private BallControl ballControl;
+    Rigidbody ballRigidBody;
+    BallControl ballControl;
 
-    private VolleyBall inputActions;
+    VolleyBall inputActions;
 
-    private GameObject clone;
+    GameObject clone;
+
+    Vector3 refTarget;
+
+    TrajectoryData shootToTargetData;
+
 
     // Start is called before the first frame update
     void Start()
     {
-
+        refTarget = target.position;
+        shootToTargetData = GetShootVelocity();
     }
 
-    private void Awake()
+    void Awake()
     {
         inputActions = new VolleyBall();
 
@@ -35,10 +42,13 @@ public class PlayerControl : MonoBehaviour
 
         InitInputCallBack();
 
-        Physics.gravity = Vector3.zero;
+        myGravity = Vector3.up * g;
+
+        Physics.gravity = myGravity;
+        ballRigidBody.useGravity = false;
     }
 
-    private void InitInputCallBack()
+    void InitInputCallBack()
     {
         inputActions.TestWithBall.Respawn.performed += InputRespawnPerformed;
 
@@ -50,15 +60,15 @@ public class PlayerControl : MonoBehaviour
         inputActions.TestWithBall.Shoot.performed += InputShootPerformed;
     }
 
-    private void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Shoot");
-        Physics.gravity = myGravity;
+        ballRigidBody.useGravity = true;
 
-        ballRigidBody.velocity = GetShootVelocity();
+        ballRigidBody.velocity = GetShootVelocity().velocity;
     }
 
-    private Vector3 GetShootVelocity()
+    TrajectoryData GetShootVelocity()
     {
         float Py = target.position.y - ball.transform.position.y;
         float Sx = target.position.x - ball.transform.position.x;
@@ -67,26 +77,28 @@ public class PlayerControl : MonoBehaviour
 
         float Uy = Mathf.Sqrt(-2 * g * Th);
 
-        float Ux = Sx / ( Mathf.Sqrt(-2 * Th / g) + Mathf.Sqrt(2 * (Py - Th) / g) );
+        float timeToTarget = Mathf.Sqrt(-2 * Th / g) + Mathf.Sqrt(2 * (Py - Th) / g);
+
+        float Ux = Sx / timeToTarget;
 
         Vector3 velocity = new Vector3(Ux, Uy, 0);
 
-        Debug.Log($"Velocity: {velocity}");
+        Debug.Log($"Velocity: {velocity} Time: {timeToTarget}");
 
-        return velocity;
+        return new TrajectoryData(velocity, timeToTarget);
 
     }
 
-    private void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Direction: Canceled");
         Destroy(clone);
         direction = Vector3.zero;
     }
 
-    private Vector3 direction;
+    Vector3 direction;
 
-    private void InputDirectionPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    void InputDirectionPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         direction = obj.ReadValue<Vector2>();
         direction.x *= -1;
@@ -107,19 +119,19 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    private void InputHitPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    void InputHitPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Hit!");
-        Physics.gravity = myGravity;
+        ballRigidBody.useGravity = true;
 
         ballRigidBody.AddForce(direction * hitForce);
     }
 
-    private void InputRespawnPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    void InputRespawnPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Respawn");
 
-        Physics.gravity = Vector3.zero;
+        ballRigidBody.useGravity = false;
         ballControl.Respawn();
     }
 
@@ -127,16 +139,59 @@ public class PlayerControl : MonoBehaviour
     void Update()
     {
         Debug.DrawLine(ball.transform.position, target.position);
+
+        if (refTarget != target.position)
+        {
+            Debug.Log($"Target moved!");
+            refTarget = target.position;
+            shootToTargetData = GetShootVelocity();
+        }
+
+        DrawTrajectory();
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
         inputActions.Enable();
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         inputActions.Disable();
     }
 
+    [SerializeField] int nbDots;
+
+    void DrawTrajectory()
+    {
+        float delta = shootToTargetData.time / (float) nbDots;
+
+        Vector3 previousDot = ballRigidBody.transform.position;
+
+        for (int i = 1; i <= nbDots; i++)
+        {
+            float t = i * delta;
+
+            Vector3 nextDot = ballRigidBody.transform.position + (shootToTargetData.velocity * t +
+                (myGravity * t * t) / 2);
+
+            Debug.DrawLine(previousDot, nextDot);
+
+            previousDot = nextDot;
+        }
+    }
+}
+
+public readonly struct TrajectoryData
+{
+    public TrajectoryData(Vector3 _velocity, float _time)
+    {
+        velocity = _velocity;
+        time = _time;
+    }
+
+    public Vector3 velocity { get; }
+    public float time { get; }
+
+    public override string ToString() => $"Velocity: {velocity} Time: {time})";
 }
