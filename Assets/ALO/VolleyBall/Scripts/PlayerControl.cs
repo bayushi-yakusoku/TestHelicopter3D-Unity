@@ -22,6 +22,7 @@ public class PlayerControl : MonoBehaviour
     GameObject clone;
 
     Vector3 refTarget;
+    Vector3 refBall;
 
     TrajectoryData shootToTargetData;
 
@@ -30,6 +31,8 @@ public class PlayerControl : MonoBehaviour
     void Start()
     {
         refTarget = target.position;
+        refBall = ballRigidBody.transform.position;
+
         shootToTargetData = GetShootVelocity();
     }
 
@@ -70,8 +73,14 @@ public class PlayerControl : MonoBehaviour
 
     TrajectoryData GetShootVelocity()
     {
-        float Py = target.position.y - ball.transform.position.y;
-        float Sx = target.position.x - ball.transform.position.x;
+        float Py = target.position.y - refBall.y;
+        float Sx = target.position.x - refBall.x;
+
+        Vector3 planXZ = new Vector3(
+            target.position.x - refBall.x,
+            0,
+            target.position.z - refBall.z);
+
         float Th = target.position.y + h;
         float g = myGravity.y;
 
@@ -80,8 +89,10 @@ public class PlayerControl : MonoBehaviour
         float timeToTarget = Mathf.Sqrt(-2 * Th / g) + Mathf.Sqrt(2 * (Py - Th) / g);
 
         float Ux = Sx / timeToTarget;
+        planXZ = planXZ / timeToTarget;
 
-        Vector3 velocity = new Vector3(Ux, Uy, 0);
+        //Vector3 velocity = new Vector3(Ux, Uy, 0);
+        Vector3 velocity = new Vector3(planXZ.x, Uy, planXZ.z);
 
         Debug.Log($"Velocity: {velocity} Time: {timeToTarget}");
 
@@ -172,7 +183,7 @@ public class PlayerControl : MonoBehaviour
         {
             float t = i * delta;
 
-            Vector3 nextDot = ballRigidBody.transform.position + (shootToTargetData.velocity * t +
+            Vector3 nextDot = refBall + (shootToTargetData.velocity * t +
                 (myGravity * t * t) / 2);
 
             Debug.DrawLine(previousDot, nextDot);
