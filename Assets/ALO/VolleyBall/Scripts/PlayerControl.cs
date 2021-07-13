@@ -62,11 +62,12 @@ public class PlayerControl : MonoBehaviour
     {
         float Py = target.position.y - ball.transform.position.y;
         float Sx = target.position.x - ball.transform.position.x;
+        float Th = target.position.y + h;
         float g = myGravity.y;
 
-        float Uy = Mathf.Sqrt(-2 * g * h);
+        float Uy = Mathf.Sqrt(-2 * g * Th);
 
-        float Ux = Sx / ( Mathf.Sqrt(-2 * h / g) + Mathf.Sqrt(2 * (Py - h) / g) );
+        float Ux = Sx / ( Mathf.Sqrt(-2 * Th / g) + Mathf.Sqrt(2 * (Py - Th) / g) );
 
         Vector3 velocity = new Vector3(Ux, Uy, 0);
 
