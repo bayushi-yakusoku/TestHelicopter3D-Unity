@@ -11,6 +11,8 @@ public class Trajectory
         Gravity = gravity;
         Hight = hight;
         NbDots = nbDots;
+
+        invalidated = true;
     }
 
     public Trajectory(Vector3 origin, Vector3 target, float high = 6, float nbDots = 20)
@@ -23,7 +25,7 @@ public class Trajectory
         set
         {
             origin = value;
-            UpdateTrajectoryData();
+            invalidated = true;
         }
     }
 
@@ -35,7 +37,7 @@ public class Trajectory
         set
         {
             target = value;
-            UpdateTrajectoryData();
+            invalidated = true;
         }
     }
 
@@ -46,7 +48,7 @@ public class Trajectory
         set
         {
             gravity = value;
-            UpdateTrajectoryData();
+            invalidated = true;
         }
     }
 
@@ -58,17 +60,26 @@ public class Trajectory
         set
         {
             hight = value;
-            UpdateTrajectoryData();
+            invalidated = true;
         }
     }
 
     public float NbDots { get; set; }
 
+    bool invalidated = true;
+
     // Read Only:
     Vector3 velocity;
     public Vector3 Velocity
     {
-        get => velocity;
+        get 
+        {
+            if (invalidated)
+                UpdateTrajectoryData();
+
+            return velocity;
+        }
+
         private set => velocity = value;
     }
 
@@ -76,8 +87,22 @@ public class Trajectory
     float timeToTarget;
     public float TimeToTarget
     {
-        get => timeToTarget;
+        get 
+        {
+            if (invalidated)
+                UpdateTrajectoryData();
+
+            return timeToTarget;
+        }
+
         private set => timeToTarget = value;
+    }
+
+    public void UpdateProperties(float hight, float gravity, float nbDots)
+    {
+        Hight = hight;
+        Gravity = Vector3.up * gravity;
+        NbDots = nbDots;
     }
 
     /*
@@ -106,11 +131,13 @@ public class Trajectory
         timeToTarget = Mathf.Sqrt(-2 * trajectorySummit / Gravity.y) + 
             Mathf.Sqrt(2 * (targetHight - trajectorySummit) / Gravity.y);
 
-        planXZ /= TimeToTarget;
+        planXZ /= timeToTarget;
 
         velocity = new Vector3(planXZ.x, velocityY, planXZ.z);
 
-        Debug.Log($"Velocity: {Velocity} Time: {TimeToTarget}");
+        invalidated = false;
+
+        Debug.Log($"Trajectory Updated! Velocity: {velocity} Time: {timeToTarget}");
     }
 
     /*
@@ -119,6 +146,9 @@ public class Trajectory
      */
     public void DrawTrajectory()
     {
+        if (invalidated)
+            UpdateTrajectoryData();
+
         float deltaTime = timeToTarget / (float)NbDots;
 
         Vector3 previousDot = Origin;

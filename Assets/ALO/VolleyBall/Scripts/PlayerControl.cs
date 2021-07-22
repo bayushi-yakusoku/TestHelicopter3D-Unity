@@ -13,6 +13,7 @@ public class PlayerControl : MonoBehaviour
 
     [SerializeField] float g;
 
+    [SerializeField] bool drawTrajectory;
     [SerializeField] int nbDots;
 
     Vector3 myGravity;
@@ -27,7 +28,7 @@ public class PlayerControl : MonoBehaviour
     Vector3 refTarget;
     Vector3 refBall;
 
-    Trajectory refTrajectory;
+    Trajectory refTrajectory = new Trajectory(Vector3.zero, Vector3.zero);
 
 
     // Start is called before the first frame update
@@ -127,8 +128,6 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.DrawLine(ball.transform.position, target.position);
-
         if (refTarget != target.position)
         {
             Debug.Log($"Target moved!");
@@ -136,7 +135,8 @@ public class PlayerControl : MonoBehaviour
             refTrajectory.Target = refTarget;
         }
 
-        refTrajectory.DrawTrajectory();
+        if (drawTrajectory)
+            refTrajectory.DrawTrajectory();
     }
 
     void OnEnable()
@@ -147,5 +147,14 @@ public class PlayerControl : MonoBehaviour
     void OnDisable()
     {
         inputActions.Disable();
+    }
+
+    private void OnValidate()
+    {
+        Debug.Log($"Validate event!");
+        refTrajectory.Hight = h;
+        refTrajectory.Gravity = Vector3.up * g;
+        Physics.gravity = refTrajectory.Gravity;
+        refTrajectory.NbDots = nbDots;
     }
 }
