@@ -24,40 +24,38 @@ public class PlayerControl : MonoBehaviour
 
     VolleyBall inputActions;
 
-    GameObject clone;
+    GameObject hitDirectionArrow;
+    Vector3 direction;
 
     Vector3 refTarget;
-    Vector3 refBall;
 
-    Trajectory refTrajectory = new Trajectory(Vector3.zero, Vector3.zero);
+    Trajectory trajToTarget = new Trajectory(Vector3.zero, Vector3.zero);
 
-    Scene currentScene;
-    Scene predictionScene;
-
-    PhysicsScene currentPhysicsScene;
-    PhysicsScene predictionPhysicsScene;
-
-    Rigidbody dummyBall;
-    LineRenderer lineRenderer;
+    PhysicsScene realPhysicScene;
 
     PrediktPhysic prediktPhysic;
+
+    List<Vector3> predikTraj = new List<Vector3>();
+
+    bool hitPressed = false;
+
+
 
     // Start is called before the first frame update
     void Start()
     {
         refTarget = target.position;
-        refBall = ballRigidBody.transform.position;
 
-        refTrajectory = new Trajectory(
+        trajToTarget = new Trajectory(
             ballRigidBody.position,
             target.position,
             myGravity,
             h);
 
         //PreparePhysicScene();
-        prediktPhysic = new PrediktPhysic(currentScene);
+        prediktPhysic = new PrediktPhysic(SceneManager.GetActiveScene());
+        realPhysicScene = SceneManager.GetActiveScene().GetPhysicsScene();
         prediktPhysic.AddMobile(ball, ball.transform.position);
-
     }
 
     void Awake()
@@ -75,16 +73,7 @@ public class PlayerControl : MonoBehaviour
         ballRigidBody.useGravity = false;
 
         Physics.autoSimulation = false;
-
-        currentScene = SceneManager.GetActiveScene();
-        currentPhysicsScene = currentScene.GetPhysicsScene();
-
-        CreateSceneParameters parameters = new CreateSceneParameters(LocalPhysicsMode.Physics3D);
-        predictionScene = SceneManager.CreateScene("Prediction", parameters);
-        predictionPhysicsScene = predictionScene.GetPhysicsScene();
     }
-
-    bool hitPressed = false;
 
     void InitInputCallBack()
     {
@@ -104,19 +93,15 @@ public class PlayerControl : MonoBehaviour
         Debug.Log("Shoot");
         ballRigidBody.useGravity = true;
 
-        ballRigidBody.velocity = refTrajectory.Velocity;
+        ballRigidBody.velocity = trajToTarget.Velocity;
     }
 
     void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Direction: Canceled");
-        Destroy(clone);
+        Destroy(hitDirectionArrow);
         direction = Vector3.zero;
     }
-
-    Vector3 direction;
-
-    List<Vector3> predikTraj = new List<Vector3>();
 
     void InputDirectionPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
@@ -125,17 +110,15 @@ public class PlayerControl : MonoBehaviour
 
         Debug.Log($"Direction: {direction}");
 
-        if (clone)
+        if (hitDirectionArrow)
         {
-            //clone.transform.Rotate(direction);
-
             Vector3 target = transform.position + (Vector3) (direction);
-            clone.transform.LookAt(target);
+            hitDirectionArrow.transform.LookAt(target);
             Debug.Log($"Target: {target}");
         }
         else
         {
-            clone = Instantiate(arrow, transform);
+            hitDirectionArrow = Instantiate(arrow, transform);
         }
 
         if (hitPressed)
@@ -175,11 +158,11 @@ public class PlayerControl : MonoBehaviour
         {
             Debug.Log($"Target moved!");
             refTarget = target.position;
-            refTrajectory.Target = refTarget;
+            trajToTarget.Target = refTarget;
         }
 
         if (drawTrajectory)
-            refTrajectory.DrawTrajectory();
+            trajToTarget.DrawTrajectory();
 
         if (predikTraj.Count > 0)
         {
@@ -196,9 +179,9 @@ public class PlayerControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (currentPhysicsScene.IsValid())
+        if (realPhysicScene.IsValid())
         {
-            currentPhysicsScene.Simulate(Time.fixedDeltaTime);
+            realPhysicScene.Simulate(Time.fixedDeltaTime);
         }
     }
 
@@ -215,36 +198,9 @@ public class PlayerControl : MonoBehaviour
     private void OnValidate()
     {
         Debug.Log($"Validate event!");
-        refTrajectory.Hight = h;
-        refTrajectory.Gravity = Vector3.up * g;
-        Physics.gravity = refTrajectory.Gravity;
-        refTrajectory.NbDots = nbDots;
-    }
-
-    GameObject[] rootObjects;
-    GameObject[] staticObjects;
-    void PreparePhysicScene()
-    {
-        rootObjects = currentScene.GetRootGameObjects();
-
-        foreach (GameObject item in rootObjects)
-        {
-            if (item.isStatic)
-            {
-                Debug.Log($"Name: {item.name} is static");
-                
-                if (item.GetComponentInChildren<Collider>())
-                {
-                    Debug.Log($"Name: {item.name} has a collider");
-
-                    GameObject tmp = Instantiate(item);
-
-                    foreach (Renderer rend in tmp.GetComponentsInChildren<Renderer>())
-                    {
-                        rend.enabled = false;
-                    }
-                }
-            }
-        }
+        trajToTarget.Hight = h;
+        trajToTarget.Gravity = Vector3.up * g;
+        Physics.gravity = trajToTarget.Gravity;
+        trajToTarget.NbDots = nbDots;
     }
 }
