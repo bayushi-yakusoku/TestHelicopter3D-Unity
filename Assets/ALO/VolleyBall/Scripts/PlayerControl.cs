@@ -58,7 +58,6 @@ public class PlayerControl : MonoBehaviour
         prediktPhysic = new PrediktPhysic(currentScene);
         prediktPhysic.AddMobile(ball, ball.transform.position);
 
-        //predikTraj = prediktPhysic.Predikt(new Vector3(100, 100, 0));
     }
 
     void Awake()
@@ -85,11 +84,14 @@ public class PlayerControl : MonoBehaviour
         predictionPhysicsScene = predictionScene.GetPhysicsScene();
     }
 
+    bool hitPressed = false;
+
     void InitInputCallBack()
     {
         inputActions.TestWithBall.Respawn.performed += InputRespawnPerformed;
 
         inputActions.TestWithBall.Hit.performed += InputHitPerformed;
+        inputActions.TestWithBall.Hit.canceled += InputHitCanceled;
 
         inputActions.TestWithBall.Direction.performed += InputDirectionPerformed;
         inputActions.TestWithBall.Direction.canceled += InputDirectionCanceled;
@@ -135,16 +137,27 @@ public class PlayerControl : MonoBehaviour
         {
             clone = Instantiate(arrow, transform);
         }
+
+        if (hitPressed)
+        {
+            predikTraj = prediktPhysic.Predikt(direction * hitForce, nbDots);
+        }
+    }
+
+    private void InputHitCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        hitPressed = false;
+        Debug.Log("Hit Canceled!");
+
+        ballRigidBody.useGravity = true;
+        ballRigidBody.AddForce(direction * hitForce, ForceMode.Impulse);
     }
 
     void InputHitPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        Debug.Log("Hit!");
-        ballRigidBody.useGravity = true;
+        hitPressed = true;
 
-        ballRigidBody.AddForce(direction * hitForce);
-
-        predikTraj = prediktPhysic.Predikt(new Vector3(10, -10, 0), 50);
+        Debug.Log("Hit performed!");
     }
 
     void InputRespawnPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)

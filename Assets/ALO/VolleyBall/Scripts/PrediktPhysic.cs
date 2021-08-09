@@ -43,7 +43,10 @@ public class PrediktPhysic
 
         foreach (KeyValuePair<string, GameObject> kvp in tmpList)
         {
-            GameObject tmp = MonoBehaviour.Instantiate(kvp.Value);
+            GameObject tmp = MonoBehaviour.Instantiate(
+                kvp.Value, 
+                kvp.Value.transform.position, 
+                kvp.Value.transform.rotation);
 
             foreach (Renderer renderer in tmp.GetComponentsInChildren<Renderer>())
             {
