@@ -24,6 +24,9 @@ public class Trajectory
         get => origin;
         set
         {
+            if (origin == value)
+                return;
+
             origin = value;
             invalidated = true;
         }

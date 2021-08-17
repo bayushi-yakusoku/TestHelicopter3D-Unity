@@ -5,11 +5,24 @@ using UnityEngine.SceneManagement;
 
 public class PlayerControl : MonoBehaviour
 {
+    enum Target
+    {
+        Libero,
+        Setter,
+        Hitter,
+        Enemy
+    }
+
+    Target currentTarget = Target.Libero;
+
     [SerializeField] GameObject ball;
     [SerializeField] float hitForce;
     [SerializeField] GameObject arrow;
 
-    [SerializeField] Transform target;
+    [SerializeField] Transform targetLibero;
+    [SerializeField] Transform targetSetter;
+    [SerializeField] Transform targetHitter;
+    [SerializeField] Transform targetEnemy;
     [SerializeField] float h;
 
     [SerializeField] float g;
@@ -44,11 +57,13 @@ public class PlayerControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        refTarget = target.position;
+        refTarget = targetLibero.position;
+
+        currentTarget = Target.Libero;
 
         trajToTarget = new Trajectory(
             ballRigidBody.position,
-            target.position,
+            targetLibero.position,
             myGravity,
             h);
 
@@ -94,6 +109,30 @@ public class PlayerControl : MonoBehaviour
         ballRigidBody.useGravity = true;
 
         ballRigidBody.velocity = trajToTarget.Velocity;
+
+        // Switch Target:
+        switch(currentTarget)
+        {
+            case Target.Libero:
+                currentTarget = Target.Setter;
+                trajToTarget.Target = targetSetter.position;
+                break;
+
+            case Target.Setter:
+                currentTarget = Target.Hitter;
+                trajToTarget.Target = targetHitter.position;
+                break;
+
+            case Target.Hitter:
+                currentTarget = Target.Enemy;
+                trajToTarget.Target = targetEnemy.position;
+                break;
+
+            default:
+                Debug.LogError("Target for calculate trajectory is not set");
+                break;
+
+        }
     }
 
     void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -149,15 +188,18 @@ public class PlayerControl : MonoBehaviour
 
         ballRigidBody.useGravity = false;
         ballControl.Respawn();
+
+        currentTarget = Target.Libero;
+        trajToTarget.Target = targetLibero.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (refTarget != target.position)
+        if (refTarget != targetLibero.position)
         {
             Debug.Log($"Target moved!");
-            refTarget = target.position;
+            refTarget = targetLibero.position;
             trajToTarget.Target = refTarget;
         }
 
@@ -182,6 +224,8 @@ public class PlayerControl : MonoBehaviour
         if (realPhysicScene.IsValid())
         {
             realPhysicScene.Simulate(Time.fixedDeltaTime);
+
+            trajToTarget.Origin = ballRigidBody.position;
         }
     }
 
