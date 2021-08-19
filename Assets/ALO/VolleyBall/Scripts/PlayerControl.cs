@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -103,12 +104,17 @@ public class PlayerControl : MonoBehaviour
         inputActions.TestWithBall.Shoot.performed += InputShootPerformed;
     }
 
+
+    List<List<Vector3>> listTrajectories = new List<List<Vector3>>();
+
     void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Debug.Log("Shoot");
         ballRigidBody.useGravity = true;
 
         ballRigidBody.velocity = trajToTarget.Velocity;
+
+        listTrajectories.Add(trajToTarget.ListDots);
 
         // Switch Target:
         switch(currentTarget)
@@ -189,6 +195,8 @@ public class PlayerControl : MonoBehaviour
         ballRigidBody.useGravity = false;
         ballControl.Respawn();
 
+        listTrajectories.Clear();
+
         currentTarget = Target.Libero;
         trajToTarget.Target = targetLibero.position;
     }
@@ -204,7 +212,7 @@ public class PlayerControl : MonoBehaviour
         }
 
         if (drawTrajectory)
-            trajToTarget.DrawTrajectory();
+            DrawTrajectories();
 
         if (predikTraj.Count > 0)
         {
@@ -217,6 +225,30 @@ public class PlayerControl : MonoBehaviour
             }
         }
 
+    }
+
+    void DrawTrajectories()
+    {
+        trajToTarget.DrawTrajectory();
+
+        foreach (List<Vector3> trajectory in listTrajectories)
+        {
+            DrawDots(trajectory);
+        }
+    }
+
+    private void DrawDots(List<Vector3> listDots)
+    {
+        if (listDots.Count == 0)
+            return;
+
+        Vector3 previousDot = listDots[0];
+
+        foreach (Vector3 nextDot in listDots)
+        {
+            Debug.DrawLine(previousDot, nextDot);
+            previousDot = nextDot;
+        }
     }
 
     void FixedUpdate()
