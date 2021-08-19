@@ -140,21 +140,33 @@ public class Trajectory
 
         invalidated = false;
 
+        UpdateListDots();
+
         Debug.Log($"Trajectory Updated! Velocity: {velocity} Time: {timeToTarget}");
+    }
+
+    List<Vector3> listDots;
+    public List<Vector3> ListDots { 
+        private set => listDots = value;
+
+        get 
+        {
+            if (invalidated)
+                UpdateTrajectoryData();
+
+            return listDots;
+        } 
     }
 
     /*
      * Using SUVAT Equation:
      *  S = U * T + (A * T²) / 2
      */
-    public void DrawTrajectory()
+    void UpdateListDots()
     {
-        if (invalidated)
-            UpdateTrajectoryData();
-
+        ListDots = new List<Vector3>();
+        
         float deltaTime = timeToTarget / (float)NbDots;
-
-        Vector3 previousDot = Origin;
 
         for (int index = 1; index <= NbDots; index++)
         {
@@ -163,6 +175,19 @@ public class Trajectory
             Vector3 nextDot = Origin + (velocity * time +
                 time * time * Gravity / 2);
 
+            ListDots.Add(nextDot);
+        }
+    }
+
+    public void DrawTrajectory()
+    {
+        if (invalidated)
+            UpdateTrajectoryData();
+
+        Vector3 previousDot = Origin;
+
+        foreach (Vector3 nextDot in ListDots)
+        {
             Debug.DrawLine(previousDot, nextDot);
 
             previousDot = nextDot;
