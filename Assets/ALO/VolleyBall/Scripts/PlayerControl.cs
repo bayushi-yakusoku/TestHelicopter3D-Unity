@@ -11,11 +11,13 @@ public class PlayerControl : MonoBehaviour
         Libero,
         Setter,
         Hitter,
-        Enemy
+        EnemyServer,
+        EnemyLibero
     }
 
     Target currentTarget = Target.Libero;
 
+    [SerializeField] CameraMoves cameraMoves;
     [SerializeField] GameObject ball;
     [SerializeField] float hitForce;
     [SerializeField] GameObject arrow;
@@ -23,7 +25,8 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] Transform targetLibero;
     [SerializeField] Transform targetSetter;
     [SerializeField] Transform targetHitter;
-    [SerializeField] Transform targetEnemy;
+    [SerializeField] Transform targetEnemyServer;
+    [SerializeField] Transform targetEnemyLibero;
     [SerializeField] float h;
 
     [SerializeField] float g;
@@ -59,6 +62,8 @@ public class PlayerControl : MonoBehaviour
     void Start()
     {
         refTarget = targetLibero.position;
+
+        cameraMoves.FinalPos = targetEnemyServer.position;
 
         currentTarget = Target.Libero;
 
@@ -121,17 +126,26 @@ public class PlayerControl : MonoBehaviour
         {
             case Target.Libero:
                 currentTarget = Target.Setter;
+                cameraMoves.FinalPos = targetLibero.position;
                 trajToTarget.Target = targetSetter.position;
                 break;
 
             case Target.Setter:
                 currentTarget = Target.Hitter;
+                cameraMoves.FinalPos = targetSetter.position;
                 trajToTarget.Target = targetHitter.position;
                 break;
 
             case Target.Hitter:
-                currentTarget = Target.Enemy;
-                trajToTarget.Target = targetEnemy.position;
+                currentTarget = Target.EnemyLibero;
+                cameraMoves.FinalPos = targetHitter.position;
+                trajToTarget.Target = targetEnemyLibero.position;
+                break;
+
+            case Target.EnemyLibero:
+                currentTarget = Target.Libero;
+                cameraMoves.FinalPos = targetEnemyLibero.position;
+                trajToTarget.Target = targetLibero.position;
                 break;
 
             default:
@@ -151,7 +165,7 @@ public class PlayerControl : MonoBehaviour
     void InputDirectionPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         direction = obj.ReadValue<Vector2>();
-        direction.x *= -1;
+        //direction.x *= -1;
 
         Debug.Log($"Direction: {direction}");
 
@@ -199,6 +213,7 @@ public class PlayerControl : MonoBehaviour
 
         currentTarget = Target.Libero;
         trajToTarget.Target = targetLibero.position;
+        cameraMoves.FinalPos = targetEnemyServer.position;
     }
 
     // Update is called once per frame

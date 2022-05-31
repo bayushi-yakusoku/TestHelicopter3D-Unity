@@ -110,7 +110,7 @@ public class Trajectory
 
     /*
      * Using SUVAT Equations:
-     *  1) S = U * T + (A * T²) / 2 -> On the vertical axis Uy = Sqrt(-2 * Ay * Sy)
+     *  1) S = U * T + (A * TÂ²) / 2 -> On the vertical axis Uy = Sqrt(-2 * Ay * Sy)
      *  
      *  2) On the others axis (without acceleration), we have:
      *      Ux,z = Sx,z / (sqrt(-2 * Sy / Ay) + sqrt(2 * (H - Sy) / Ay))
@@ -142,7 +142,7 @@ public class Trajectory
 
         UpdateListDots();
 
-        Debug.Log($"Trajectory Updated! Velocity: {velocity} Time: {timeToTarget}");
+        //Debug.Log($"Trajectory Updated! Velocity: {velocity} Time: {timeToTarget}");
     }
 
     List<Vector3> listDots;
@@ -160,7 +160,7 @@ public class Trajectory
 
     /*
      * Using SUVAT Equation:
-     *  S = U * T + (A * T²) / 2
+     *  S = U * T + (A * TÂ²) / 2
      */
     void UpdateListDots()
     {
