@@ -86,7 +86,7 @@ public class PrediktPhysic
         mobile.transform.rotation = Quaternion.identity;
 
         mobileRigidBody.angularVelocity = Vector3.zero;
-        mobileRigidBody.velocity = Vector3.zero;
+        mobileRigidBody.linearVelocity = Vector3.zero;
     }
 
 

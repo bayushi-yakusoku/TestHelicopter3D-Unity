@@ -30,7 +30,7 @@ public class BallControl : MonoBehaviour
         transform.position = respawnLocation;
         transform.rotation = Quaternion.identity;
 
-        body.velocity = Vector3.zero;
+        body.linearVelocity = Vector3.zero;
         body.angularVelocity = Vector3.zero;
     }
 }

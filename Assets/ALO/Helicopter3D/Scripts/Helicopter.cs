@@ -213,7 +213,7 @@ public class Helicopter : MonoBehaviour
     public void Respawn()
     {
         Debug.Log("Respawn Helicopter!");
-        rigidBody.velocity = Vector3.zero;
+        rigidBody.linearVelocity = Vector3.zero;
         rigidBody.angularVelocity = Vector3.zero;
 
         transform.position = respawnPoint;

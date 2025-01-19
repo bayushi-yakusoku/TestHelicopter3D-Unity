@@ -117,7 +117,7 @@ public class PlayerControl : MonoBehaviour
         Debug.Log("Shoot");
         ballRigidBody.useGravity = true;
 
-        ballRigidBody.velocity = trajToTarget.Velocity;
+        ballRigidBody.linearVelocity = trajToTarget.Velocity;
 
         listTrajectories.Add(trajToTarget.ListDots);
 
