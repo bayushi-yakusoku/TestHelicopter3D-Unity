@@ -10,6 +10,8 @@ public class PrediktPhysic {
     PhysicsScene prediktPhysicScene;
 
     public PrediktPhysic(Scene source) {
+        Debug.Log(this + $": Start of initialization");
+
         this.source = source;
 
         prediktScene = SceneManager.CreateScene(
@@ -20,12 +22,14 @@ public class PrediktPhysic {
 
         CopystaticObjects();
 
-        Debug.Log($"PrediktPhysic: End of initialization");
+        Debug.Log(this + $": End of initialization");
     }
 
     readonly Dictionary<string, GameObject> staticObjects = new();
 
     void CopystaticObjects() {
+        Debug.Log(this + $": Adding Static objects to physic scene");
+
         Dictionary<string, GameObject> tmpList = new();
 
         foreach (GameObject root in source.GetRootGameObjects()) {
@@ -56,6 +60,8 @@ public class PrediktPhysic {
     Rigidbody mobileRigidBody;
     Vector3 initialPosition;
     public void AddMobile(GameObject obj, Vector3 position) {
+        Debug.Log(this + $": Adding Mobile objects to physic scene");
+
         mobile = MonoBehaviour.Instantiate(obj);
 
         foreach (Renderer renderer in mobile.GetComponentsInChildren<Renderer>()) {
@@ -72,6 +78,8 @@ public class PrediktPhysic {
     }
 
     void ResetScene() {
+        Debug.Log(this + $": Reset scene");
+
         mobile.transform.SetPositionAndRotation(initialPosition, Quaternion.identity);
 
         mobileRigidBody.angularVelocity = Vector3.zero;
@@ -80,6 +88,8 @@ public class PrediktPhysic {
 
 
     public List<Vector3> Predikt(Vector3 force, int iterate = 20) {
+        Debug.Log(this + $": Predikt");
+
         ResetScene();
 
         List<Vector3> result = new();

@@ -98,6 +98,12 @@ public class Trajectory {
      *  
      *  2) On the others axis (without acceleration), we have:
      *      Ux,z = Sx,z / (sqrt(-2 * Sy / Ay) + sqrt(2 * (H - Sy) / Ay))
+     *  
+     *  S: Distance - metres (m)
+     *  U: Initial velocity - metres per second (ms−1)
+     *  V: Instant Velocity - metres per second (ms−1)
+     *  A: Acceleration - metres per second per second (ms−2)
+     *  T: Time - seconds (s)
      *      
      *  Better explain here:
      *  https://www.youtube.com/watch?v=IvT8hjy6q4o
@@ -126,7 +132,7 @@ public class Trajectory {
 
         UpdateListDots();
 
-        //Debug.Log($"Trajectory Updated! Velocity: {velocity} Time: {timeToTarget}");
+        //Debug.Log(this + $": Trajectory Updated! Velocity: {velocity} Time: {timeToTarget}");
     }
 
     List<Vector3> listDots;

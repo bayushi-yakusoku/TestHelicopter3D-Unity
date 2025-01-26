@@ -23,9 +23,9 @@ public class PlayerControl : MonoBehaviour {
     [SerializeField] Transform targetHitter;
     [SerializeField] Transform targetEnemyServer;
     [SerializeField] Transform targetEnemyLibero;
-    [SerializeField] float h;
+    [SerializeField] float height;
 
-    [SerializeField] float g;
+    [SerializeField] float gravityIntensity;
 
     [SerializeField] bool drawTrajectory;
     [SerializeField] int nbDots;
@@ -66,7 +66,7 @@ public class PlayerControl : MonoBehaviour {
             ballRigidBody.position,
             targetLibero.position,
             myGravity,
-            h
+            height
         );
 
         //PreparePhysicScene();
@@ -83,7 +83,7 @@ public class PlayerControl : MonoBehaviour {
 
         InitInputCallBack();
 
-        myGravity = Vector3.up * g;
+        myGravity = Vector3.up * gravityIntensity;
 
         Physics.gravity = myGravity;
         ballRigidBody.useGravity = false;
@@ -93,6 +93,8 @@ public class PlayerControl : MonoBehaviour {
     }
 
     void InitInputCallBack() {
+        Debug.Log(this + ": InitInputCallBack");
+
         inputActions.TestWithBall.Respawn.performed += InputRespawnPerformed;
 
         inputActions.TestWithBall.Hit.performed += InputHitPerformed;
@@ -108,7 +110,8 @@ public class PlayerControl : MonoBehaviour {
     readonly List<List<Vector3>> listTrajectories = new();
 
     void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
-        Debug.Log("Shoot");
+        Debug.Log(this + ": Shoot performed");
+
         ballRigidBody.useGravity = true;
 
         ballRigidBody.linearVelocity = trajToTarget.Velocity;
@@ -142,14 +145,16 @@ public class PlayerControl : MonoBehaviour {
                 break;
 
             default:
-                Debug.LogError("Target for calculate trajectory is not set");
+                Debug.LogError(this + ": Target for calculate trajectory is not set");
+
                 break;
 
         }
     }
 
     void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
-        Debug.Log("Direction: Canceled");
+        Debug.Log(this + ": Direction: Canceled");
+
         Destroy(hitDirectionArrow);
         direction = Vector3.zero;
     }
@@ -158,12 +163,12 @@ public class PlayerControl : MonoBehaviour {
         direction = obj.ReadValue<Vector2>();
         //direction.x *= -1;
 
-        Debug.Log($"Direction: {direction}");
+        Debug.Log(this + $": Direction: {direction}");
 
         if (hitDirectionArrow) {
             Vector3 target = transform.position + (Vector3)(direction);
             hitDirectionArrow.transform.LookAt(target);
-            Debug.Log($"Target: {target}");
+            Debug.Log(this + $": Target: {target}");
         }
         else {
             hitDirectionArrow = Instantiate(arrow, transform);
@@ -174,22 +179,29 @@ public class PlayerControl : MonoBehaviour {
         }
     }
 
+    /*
+     * Need to check if the action was performed:
+     * https://docs.unity3d.com/Packages/com.unity.inputsystem@1.12/manual/Interactions.html
+     */
     private void InputHitCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
-        hitPressed = false;
-        Debug.Log("Hit Canceled!");
+        Debug.Log(this + ": Hit Canceled!");
 
-        ballRigidBody.useGravity = true;
-        ballRigidBody.AddForce(direction * hitForce, ForceMode.Impulse);
+        if (hitPressed) {
+            ballRigidBody.useGravity = true;
+            ballRigidBody.AddForce(direction * hitForce, ForceMode.Impulse);
+        }
+
+        hitPressed = false;
     }
 
     void InputHitPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
-        hitPressed = true;
+        Debug.Log(this + ": Hit performed!");
 
-        Debug.Log("Hit performed!");
+        hitPressed = true;
     }
 
     void InputRespawnPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
-        Debug.Log("Respawn");
+        Debug.Log(this + ": Respawn");
 
         ballRigidBody.useGravity = false;
         ballControl.Respawn();
@@ -204,7 +216,8 @@ public class PlayerControl : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         if (refTarget != targetLibero.position) {
-            Debug.Log($"Target moved!");
+            Debug.Log(this + $": Target moved!");
+
             refTarget = targetLibero.position;
             trajToTarget.Target = refTarget;
         }
@@ -260,9 +273,10 @@ public class PlayerControl : MonoBehaviour {
     }
 
     private void OnValidate() {
-        Debug.Log($"Validate event!");
-        trajToTarget.Hight = h;
-        trajToTarget.Gravity = Vector3.up * g;
+        Debug.Log(this + $": Validate event!");
+
+        trajToTarget.Hight = height;
+        trajToTarget.Gravity = Vector3.up * gravityIntensity;
         Physics.gravity = trajToTarget.Gravity;
         trajToTarget.NbDots = nbDots;
     }
