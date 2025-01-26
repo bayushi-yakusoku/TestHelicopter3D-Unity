@@ -265,15 +265,19 @@ public class PlayerControl : MonoBehaviour {
     }
 
     void OnEnable() {
+        Debug.Log(this + $": OnEnable event");
+
         inputActions.Enable();
     }
 
     void OnDisable() {
+        Debug.Log(this + $": OnDisable event");
+
         inputActions.Disable();
     }
 
     private void OnValidate() {
-        Debug.Log(this + $": Validate event!");
+        Debug.Log(this + $": OnValidate event");
 
         trajToTarget.Hight = height;
         trajToTarget.Gravity = Vector3.up * gravityIntensity;
