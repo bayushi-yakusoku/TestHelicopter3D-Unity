@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PrediktPhysic {
-    string prediktSceneName = "PrediktScene";
+    const string prediktSceneName = "PrediktScene";
 
     Scene source;
     Scene prediktScene;
@@ -24,10 +24,10 @@ public class PrediktPhysic {
         Debug.Log($"PrediktPhysic: End of initialization");
     }
 
-    Dictionary<string, GameObject> staticObjects = new Dictionary<string, GameObject>();
+    readonly Dictionary<string, GameObject> staticObjects = new();
 
     void CopystaticObjects() {
-        Dictionary<string, GameObject> tmpList = new Dictionary<string, GameObject>();
+        Dictionary<string, GameObject> tmpList = new();
 
         foreach (GameObject root in source.GetRootGameObjects()) {
             foreach (Collider child in root.GetComponentsInChildren<Collider>()) {
@@ -40,7 +40,8 @@ public class PrediktPhysic {
             GameObject tmp = MonoBehaviour.Instantiate(
                 kvp.Value,
                 kvp.Value.transform.position,
-                kvp.Value.transform.rotation);
+                kvp.Value.transform.rotation
+            );
 
             foreach (Renderer renderer in tmp.GetComponentsInChildren<Renderer>()) {
                 renderer.enabled = false;
@@ -72,8 +73,7 @@ public class PrediktPhysic {
     }
 
     void ResetScene() {
-        mobile.transform.position = initialPosition;
-        mobile.transform.rotation = Quaternion.identity;
+        mobile.transform.SetPositionAndRotation(initialPosition, Quaternion.identity);
 
         mobileRigidBody.angularVelocity = Vector3.zero;
         mobileRigidBody.linearVelocity = Vector3.zero;
@@ -83,7 +83,7 @@ public class PrediktPhysic {
     public List<Vector3> Predikt(Vector3 force, int iterate = 20) {
         ResetScene();
 
-        List<Vector3> result = new List<Vector3>();
+        List<Vector3> result = new();
 
         mobileRigidBody.AddForce(force, ForceMode.Impulse);
 

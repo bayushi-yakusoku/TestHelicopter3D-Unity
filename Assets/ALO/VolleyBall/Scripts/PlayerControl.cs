@@ -44,13 +44,13 @@ public class PlayerControl : MonoBehaviour {
 
     Vector3 refTarget;
 
-    Trajectory trajToTarget = new Trajectory(Vector3.zero, Vector3.zero);
+    Trajectory trajToTarget = new(Vector3.zero, Vector3.zero);
 
     PhysicsScene realPhysicScene;
 
     PrediktPhysic prediktPhysic;
 
-    List<Vector3> predikTraj = new List<Vector3>();
+    List<Vector3> predikTraj = new();
 
     bool hitPressed = false;
 
@@ -68,7 +68,8 @@ public class PlayerControl : MonoBehaviour {
             ballRigidBody.position,
             targetLibero.position,
             myGravity,
-            h);
+            h
+        );
 
         //PreparePhysicScene();
         prediktPhysic = new PrediktPhysic(SceneManager.GetActiveScene());
@@ -106,7 +107,7 @@ public class PlayerControl : MonoBehaviour {
     }
 
 
-    List<List<Vector3>> listTrajectories = new List<List<Vector3>>();
+    readonly List<List<Vector3>> listTrajectories = new();
 
     void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         Debug.Log("Shoot");

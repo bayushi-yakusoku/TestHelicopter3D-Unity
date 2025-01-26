@@ -106,10 +106,11 @@ public class Trajectory {
     void UpdateTrajectoryData() {
         float targetHight = Target.y - Origin.y;
 
-        Vector3 planXZ = new Vector3(
-            Target.x - Origin.x,
-            0,
-            Target.z - Origin.z);
+        Vector3 planXZ = new(
+                Target.x - Origin.x,
+                0,
+                Target.z - Origin.z
+            );
 
         float trajectorySummit = Target.y + Hight;
 
