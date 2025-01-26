@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerControl : MonoBehaviour
-{
-    enum Target
-    {
+public class PlayerControl : MonoBehaviour {
+    enum Target {
         Libero,
         Setter,
         Hitter,
@@ -59,8 +57,7 @@ public class PlayerControl : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         refTarget = targetLibero.position;
 
         cameraMoves.FinalPos = targetEnemyServer.position;
@@ -79,8 +76,7 @@ public class PlayerControl : MonoBehaviour
         prediktPhysic.AddMobile(ball, ball.transform.position);
     }
 
-    void Awake()
-    {
+    void Awake() {
         inputActions = new VolleyBall();
 
         ballRigidBody = ball.GetComponent<Rigidbody>();
@@ -93,11 +89,11 @@ public class PlayerControl : MonoBehaviour
         Physics.gravity = myGravity;
         ballRigidBody.useGravity = false;
 
-        Physics.autoSimulation = false;
+        //Physics.autoSimulation = false;
+        Physics.simulationMode = SimulationMode.Script;
     }
 
-    void InitInputCallBack()
-    {
+    void InitInputCallBack() {
         inputActions.TestWithBall.Respawn.performed += InputRespawnPerformed;
 
         inputActions.TestWithBall.Hit.performed += InputHitPerformed;
@@ -112,8 +108,7 @@ public class PlayerControl : MonoBehaviour
 
     List<List<Vector3>> listTrajectories = new List<List<Vector3>>();
 
-    void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
+    void InputShootPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         Debug.Log("Shoot");
         ballRigidBody.useGravity = true;
 
@@ -122,8 +117,7 @@ public class PlayerControl : MonoBehaviour
         listTrajectories.Add(trajToTarget.ListDots);
 
         // Switch Target:
-        switch(currentTarget)
-        {
+        switch (currentTarget) {
             case Target.Libero:
                 currentTarget = Target.Setter;
                 cameraMoves.FinalPos = targetLibero.position;
@@ -155,39 +149,33 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
+    void InputDirectionCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         Debug.Log("Direction: Canceled");
         Destroy(hitDirectionArrow);
         direction = Vector3.zero;
     }
 
-    void InputDirectionPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
+    void InputDirectionPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         direction = obj.ReadValue<Vector2>();
         //direction.x *= -1;
 
         Debug.Log($"Direction: {direction}");
 
-        if (hitDirectionArrow)
-        {
-            Vector3 target = transform.position + (Vector3) (direction);
+        if (hitDirectionArrow) {
+            Vector3 target = transform.position + (Vector3)(direction);
             hitDirectionArrow.transform.LookAt(target);
             Debug.Log($"Target: {target}");
         }
-        else
-        {
+        else {
             hitDirectionArrow = Instantiate(arrow, transform);
         }
 
-        if (hitPressed)
-        {
+        if (hitPressed) {
             predikTraj = prediktPhysic.Predikt(direction * hitForce, nbDots);
         }
     }
 
-    private void InputHitCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
+    private void InputHitCanceled(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         hitPressed = false;
         Debug.Log("Hit Canceled!");
 
@@ -195,15 +183,13 @@ public class PlayerControl : MonoBehaviour
         ballRigidBody.AddForce(direction * hitForce, ForceMode.Impulse);
     }
 
-    void InputHitPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
+    void InputHitPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         hitPressed = true;
 
         Debug.Log("Hit performed!");
     }
 
-    void InputRespawnPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
+    void InputRespawnPerformed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
         Debug.Log("Respawn");
 
         ballRigidBody.useGravity = false;
@@ -217,10 +203,8 @@ public class PlayerControl : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (refTarget != targetLibero.position)
-        {
+    void Update() {
+        if (refTarget != targetLibero.position) {
             Debug.Log($"Target moved!");
             refTarget = targetLibero.position;
             trajToTarget.Target = refTarget;
@@ -229,12 +213,10 @@ public class PlayerControl : MonoBehaviour
         if (drawTrajectory)
             DrawTrajectories();
 
-        if (predikTraj.Count > 0)
-        {
+        if (predikTraj.Count > 0) {
             Vector3 previous = predikTraj[0];
 
-            foreach (Vector3 pos in predikTraj)
-            {
+            foreach (Vector3 pos in predikTraj) {
                 Debug.DrawLine(previous, pos);
                 previous = pos;
             }
@@ -242,52 +224,43 @@ public class PlayerControl : MonoBehaviour
 
     }
 
-    void DrawTrajectories()
-    {
+    void DrawTrajectories() {
         trajToTarget.DrawTrajectory();
 
-        foreach (List<Vector3> trajectory in listTrajectories)
-        {
+        foreach (List<Vector3> trajectory in listTrajectories) {
             DrawDots(trajectory);
         }
     }
 
-    private void DrawDots(List<Vector3> listDots)
-    {
+    private void DrawDots(List<Vector3> listDots) {
         if (listDots.Count == 0)
             return;
 
         Vector3 previousDot = listDots[0];
 
-        foreach (Vector3 nextDot in listDots)
-        {
+        foreach (Vector3 nextDot in listDots) {
             Debug.DrawLine(previousDot, nextDot);
             previousDot = nextDot;
         }
     }
 
-    void FixedUpdate()
-    {
-        if (realPhysicScene.IsValid())
-        {
+    void FixedUpdate() {
+        if (realPhysicScene.IsValid()) {
             realPhysicScene.Simulate(Time.fixedDeltaTime);
 
             trajToTarget.Origin = ballRigidBody.position;
         }
     }
 
-    void OnEnable()
-    {
+    void OnEnable() {
         inputActions.Enable();
     }
 
-    void OnDisable()
-    {
+    void OnDisable() {
         inputActions.Disable();
     }
 
-    private void OnValidate()
-    {
+    private void OnValidate() {
         Debug.Log($"Validate event!");
         trajToTarget.Hight = h;
         trajToTarget.Gravity = Vector3.up * g;

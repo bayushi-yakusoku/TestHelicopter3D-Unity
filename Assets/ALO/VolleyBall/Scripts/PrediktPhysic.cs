@@ -3,20 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PrediktPhysic
-{
+public class PrediktPhysic {
     string prediktSceneName = "PrediktScene";
 
     Scene source;
     Scene prediktScene;
     PhysicsScene prediktPhysicScene;
 
-    public PrediktPhysic(Scene source)
-    {
+    public PrediktPhysic(Scene source) {
         this.source = source;
 
         prediktScene = SceneManager.CreateScene(
-            prediktSceneName, 
+            prediktSceneName,
             new CreateSceneParameters(LocalPhysicsMode.Physics3D));
 
         prediktPhysicScene = prediktScene.GetPhysicsScene();
@@ -25,31 +23,26 @@ public class PrediktPhysic
 
         Debug.Log($"PrediktPhysic: End of initialization");
     }
-    
+
     Dictionary<string, GameObject> staticObjects = new Dictionary<string, GameObject>();
 
-    void CopystaticObjects()
-    {
+    void CopystaticObjects() {
         Dictionary<string, GameObject> tmpList = new Dictionary<string, GameObject>();
 
-        foreach (GameObject root in source.GetRootGameObjects())
-        {
-            foreach (Collider child in root.GetComponentsInChildren<Collider>())
-            {
+        foreach (GameObject root in source.GetRootGameObjects()) {
+            foreach (Collider child in root.GetComponentsInChildren<Collider>()) {
                 if (child.gameObject.isStatic)
                     tmpList[child.gameObject.name] = child.gameObject;
             }
         }
 
-        foreach (KeyValuePair<string, GameObject> kvp in tmpList)
-        {
+        foreach (KeyValuePair<string, GameObject> kvp in tmpList) {
             GameObject tmp = MonoBehaviour.Instantiate(
-                kvp.Value, 
-                kvp.Value.transform.position, 
+                kvp.Value,
+                kvp.Value.transform.position,
                 kvp.Value.transform.rotation);
 
-            foreach (Renderer renderer in tmp.GetComponentsInChildren<Renderer>())
-            {
+            foreach (Renderer renderer in tmp.GetComponentsInChildren<Renderer>()) {
                 renderer.enabled = false;
             }
 
@@ -62,26 +55,23 @@ public class PrediktPhysic
     GameObject mobile;
     Rigidbody mobileRigidBody;
     Vector3 initialPosition;
-    public void AddMobile(GameObject obj, Vector3 position)
-    {
+    public void AddMobile(GameObject obj, Vector3 position) {
         mobile = MonoBehaviour.Instantiate(obj);
 
-        foreach (Renderer renderer in mobile.GetComponentsInChildren<Renderer>())
-        {
+        foreach (Renderer renderer in mobile.GetComponentsInChildren<Renderer>()) {
             renderer.enabled = false;
         }
 
         mobileRigidBody = mobile.GetComponent<Rigidbody>();
 
         SceneManager.MoveGameObjectToScene(mobile, prediktScene);
-        
+
         mobileRigidBody.useGravity = true;
 
         initialPosition = position;
     }
 
-    void ResetScene()
-    {
+    void ResetScene() {
         mobile.transform.position = initialPosition;
         mobile.transform.rotation = Quaternion.identity;
 
@@ -90,16 +80,14 @@ public class PrediktPhysic
     }
 
 
-    public List<Vector3> Predikt(Vector3 force, int iterate = 20)
-    {
+    public List<Vector3> Predikt(Vector3 force, int iterate = 20) {
         ResetScene();
 
         List<Vector3> result = new List<Vector3>();
 
         mobileRigidBody.AddForce(force, ForceMode.Impulse);
 
-        for (int step = 0; step < iterate; step++)
-        {
+        for (int step = 0; step < iterate; step++) {
             prediktPhysicScene.Simulate(Time.fixedDeltaTime);
 
             result.Add(mobile.transform.position);

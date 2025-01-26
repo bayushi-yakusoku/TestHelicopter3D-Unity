@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Trajectory
-{
-    public Trajectory(Vector3 origin, Vector3 target, Vector3 gravity, float hight = 6, float nbDots = 20)
-    {
+public class Trajectory {
+    public Trajectory(Vector3 origin, Vector3 target, Vector3 gravity, float hight = 6, float nbDots = 20) {
         Origin = origin;
         Target = target;
         Gravity = gravity;
@@ -19,11 +17,9 @@ public class Trajectory
         : this(origin, target, Physics.gravity, high, nbDots) { }
 
     Vector3 origin;
-    public Vector3 Origin
-    {
+    public Vector3 Origin {
         get => origin;
-        set
-        {
+        set {
             if (origin == value)
                 return;
 
@@ -34,22 +30,18 @@ public class Trajectory
 
 
     Vector3 target;
-    public Vector3 Target
-    {
+    public Vector3 Target {
         get => target;
-        set
-        {
+        set {
             target = value;
             invalidated = true;
         }
     }
 
     Vector3 gravity;
-    public Vector3 Gravity
-    {
+    public Vector3 Gravity {
         get => gravity;
-        set
-        {
+        set {
             gravity = value;
             invalidated = true;
         }
@@ -57,11 +49,9 @@ public class Trajectory
 
 
     float hight;
-    public float Hight
-    {
+    public float Hight {
         get => hight;
-        set
-        {
+        set {
             hight = value;
             invalidated = true;
         }
@@ -73,10 +63,8 @@ public class Trajectory
 
     // Read Only:
     Vector3 velocity;
-    public Vector3 Velocity
-    {
-        get 
-        {
+    public Vector3 Velocity {
+        get {
             if (invalidated)
                 UpdateTrajectoryData();
 
@@ -88,10 +76,8 @@ public class Trajectory
 
     // Read Only:
     float timeToTarget;
-    public float TimeToTarget
-    {
-        get 
-        {
+    public float TimeToTarget {
+        get {
             if (invalidated)
                 UpdateTrajectoryData();
 
@@ -101,8 +87,7 @@ public class Trajectory
         private set => timeToTarget = value;
     }
 
-    public void UpdateProperties(float hight, float gravity, float nbDots)
-    {
+    public void UpdateProperties(float hight, float gravity, float nbDots) {
         Hight = hight;
         Gravity = Vector3.up * gravity;
         NbDots = nbDots;
@@ -118,8 +103,7 @@ public class Trajectory
      *  Better explain here:
      *  https://www.youtube.com/watch?v=IvT8hjy6q4o
      */
-    void UpdateTrajectoryData()
-    {
+    void UpdateTrajectoryData() {
         float targetHight = Target.y - Origin.y;
 
         Vector3 planXZ = new Vector3(
@@ -131,7 +115,7 @@ public class Trajectory
 
         float velocityY = Mathf.Sqrt(-2 * Gravity.y * trajectorySummit);
 
-        timeToTarget = Mathf.Sqrt(-2 * trajectorySummit / Gravity.y) + 
+        timeToTarget = Mathf.Sqrt(-2 * trajectorySummit / Gravity.y) +
             Mathf.Sqrt(2 * (targetHight - trajectorySummit) / Gravity.y);
 
         planXZ /= timeToTarget;
@@ -146,30 +130,27 @@ public class Trajectory
     }
 
     List<Vector3> listDots;
-    public List<Vector3> ListDots { 
+    public List<Vector3> ListDots {
         private set => listDots = value;
 
-        get 
-        {
+        get {
             if (invalidated)
                 UpdateTrajectoryData();
 
             return listDots;
-        } 
+        }
     }
 
     /*
      * Using SUVAT Equation:
      *  S = U * T + (A * T²) / 2
      */
-    void UpdateListDots()
-    {
+    void UpdateListDots() {
         ListDots = new List<Vector3>();
-        
+
         float deltaTime = timeToTarget / (float)NbDots;
 
-        for (int index = 1; index <= NbDots; index++)
-        {
+        for (int index = 1; index <= NbDots; index++) {
             float time = index * deltaTime;
 
             Vector3 nextDot = Origin + (velocity * time +
@@ -179,15 +160,13 @@ public class Trajectory
         }
     }
 
-    public void DrawTrajectory()
-    {
+    public void DrawTrajectory() {
         if (invalidated)
             UpdateTrajectoryData();
 
         Vector3 previousDot = Origin;
 
-        foreach (Vector3 nextDot in ListDots)
-        {
+        foreach (Vector3 nextDot in ListDots) {
             Debug.DrawLine(previousDot, nextDot);
 
             previousDot = nextDot;
