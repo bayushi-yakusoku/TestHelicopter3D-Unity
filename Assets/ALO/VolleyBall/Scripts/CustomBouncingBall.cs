@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CustomBouncingBall : MonoBehaviour {
     float gravity = 9.8f; // Gravity force
-    float bounceForce = 0.8f; // Bounce force multiplier
+    float bounceForce = 0.5f; // Bounce force multiplier
     float initialVerticalVelocity = 10f; // Initial upward velocity
     float initialHorizontalVelocity = 1f; // Initial horizontal velocity
     
@@ -11,9 +11,13 @@ public class CustomBouncingBall : MonoBehaviour {
     private Vector3 velocity;
     private bool isGrounded = false;
 
+    private Rigidbody rigidbody;
+
     void Start() {
         // Apply initial velocities
         velocity = new Vector3(initialHorizontalVelocity, initialVerticalVelocity, 0);
+
+        rigidbody = GetComponent<Rigidbody>();
     }
 
     void Update() {
@@ -23,13 +27,20 @@ public class CustomBouncingBall : MonoBehaviour {
         // Move the ball
         transform.Translate(velocity * Time.deltaTime);
 
-        // Check for collision with the ground plane
-        if (IsGrounded() && !isGrounded) {
-            isGrounded = true;
-            Bounce();
-        }
-        else if (!IsGrounded()) {
-            isGrounded = false;
+        //// Check for collision with the ground plane
+        //if (IsGrounded() && !isGrounded) {
+        //    isGrounded = true;
+        //    Bounce();
+        //}
+        //else if (!IsGrounded()) {
+        //    isGrounded = false;
+        //}
+    }
+
+    void OnCollisionEnter(Collision collision) {
+        // Check for collision with any object
+        if (collision.gameObject.CompareTag("BounceObject")) {
+            Bounce(collision.contacts[0].normal);
         }
     }
 
@@ -48,6 +59,14 @@ public class CustomBouncingBall : MonoBehaviour {
         // Optionally, reduce horizontal velocity on bounce to simulate friction
         Vector3 horizontalVelocity = Vector3.ProjectOnPlane(velocity, Vector3.up);
         velocity = horizontalVelocity * 0.9f + Vector3.up * velocity.y;
+    }
+
+    void Bounce(Vector3 collisionNormal) {
+        // Reflect the velocity off the collision normal
+        Vector3 reflectedVelocity = Vector3.Reflect(rigidbody.velocity, collisionNormal);
+
+        // Apply the bounce force
+        rigidbody.velocity = reflectedVelocity.normalized * bounceForce;
     }
 
     void OnDrawGizmos() {
