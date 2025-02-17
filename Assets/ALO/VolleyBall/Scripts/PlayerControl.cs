@@ -35,7 +35,7 @@ public class PlayerControl : MonoBehaviour {
     Rigidbody ballRigidBody;
     BallControl ballControl;
 
-    VolleyBall inputActions;
+    VolleyBallInputActions inputActions;
 
     GameObject hitDirectionArrow;
     Vector3 direction;
@@ -76,7 +76,7 @@ public class PlayerControl : MonoBehaviour {
     }
 
     void Awake() {
-        inputActions = new VolleyBall();
+        inputActions = new ();
 
         ballRigidBody = ball.GetComponent<Rigidbody>();
         ballControl = ball.GetComponent<BallControl>();

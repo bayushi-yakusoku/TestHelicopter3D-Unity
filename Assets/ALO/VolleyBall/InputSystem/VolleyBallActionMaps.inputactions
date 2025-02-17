@@ -1,5 +1,5 @@
 {
-    "name": "VolleyBall",
+    "name": "VolleyBallActionMaps",
     "maps": [
         {
             "name": "TestWithBall",
@@ -11,7 +11,8 @@
                     "id": "6e04dd5e-2a39-4cf1-848e-0647cda5b171",
                     "expectedControlType": "Stick",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Hit",
@@ -19,7 +20,8 @@
                     "id": "a7e09703-3bd2-4df5-a4f8-60946ddee8ad",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Respawn",
@@ -27,7 +29,8 @@
                     "id": "9eea9c52-8736-4f7f-878a-425984d3627e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Shoot",
@@ -35,7 +38,8 @@
                     "id": "eeddcd21-eb1c-4f2a-8fba-5681597f85a6",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [

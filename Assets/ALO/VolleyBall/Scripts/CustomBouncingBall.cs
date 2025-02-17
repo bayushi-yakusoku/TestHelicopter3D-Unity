@@ -31,16 +31,18 @@ public class CustomBouncingBall : MonoBehaviour {
             Debug.DrawRay(collisionPoint.Item1, collisionPoint.Item2, Color.white);
         }
 
+        // Draw the velocity vector:
+        Debug.DrawRay(transform.position, velocity, Color.red);
+
+        // Draw the gravity vector:
+        Debug.DrawRay(transform.position, Vector3.down * gravity, Color.green);
+
     }
 
     void OnCollisionEnter(Collision collision) {
         Debug.Log(this + "reacting to Collision");
 
-        //// Debug-draw all contact points and normals
-        //foreach (ContactPoint contact in collision.contacts) {
-        //    Debug.DrawRay(contact.point, contact.normal, Color.white);
-        //}
-
+        // Debug add current contact point and normal
         collisionPoints.Add((collision.contacts[0].point, collision.contacts[0].normal));
 
         // Bounce on the first object:
