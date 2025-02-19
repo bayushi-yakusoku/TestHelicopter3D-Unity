@@ -15,4 +15,13 @@ public class BallControl : MonoBehaviour {
         body.linearVelocity = Vector3.zero;
         body.angularVelocity = Vector3.zero;
     }
+
+    // On collision with the ground play bounce sound:
+    private void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.CompareTag("Ground")) {
+            Debug.Log(this + ": Bounce on the ground");
+
+            SfxController.Singleton.PlayBounceFloorSfx(transform.position);
+        }
+    }
 }

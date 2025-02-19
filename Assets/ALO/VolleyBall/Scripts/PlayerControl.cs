@@ -121,27 +121,43 @@ public class PlayerControl : MonoBehaviour {
         // Switch Target:
         switch (currentTarget) {
             case Target.Libero:
+                Debug.Log(this + $": my target is {currentTarget}");
+
                 currentTarget = Target.Setter;
-                //cameraMoves.FinalPos = targetLibero.position;
                 trajToTarget.Target = targetSetter.position;
+
+                SfxController.Singleton.PlaySpikeSfx(ball.transform.position);
+
                 break;
 
             case Target.Setter:
+                Debug.Log(this + $": my target is {currentTarget}");
+
                 currentTarget = Target.Hitter;
-                //cameraMoves.FinalPos = targetSetter.position;
                 trajToTarget.Target = targetHitter.position;
+
+                SfxController.Singleton.PlayReceptionSfx(ball.transform.position);
+
                 break;
 
             case Target.Hitter:
+                Debug.Log(this + $": my target is {currentTarget}");
+
                 currentTarget = Target.EnemyLibero;
-                //cameraMoves.FinalPos = targetHitter.position;
                 trajToTarget.Target = targetEnemyLibero.position;
+
+                SfxController.Singleton.PlaySetSfx(ball.transform.position);
+
                 break;
 
             case Target.EnemyLibero:
+                Debug.Log(this + $": my target is {currentTarget}");
+
                 currentTarget = Target.Libero;
-                //cameraMoves.FinalPos = targetEnemyLibero.position;
                 trajToTarget.Target = targetLibero.position;
+
+                SfxController.Singleton.PlaySpikeSfx(ball.transform.position);
+
                 break;
 
             default:
