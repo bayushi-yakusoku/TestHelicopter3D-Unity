@@ -13,7 +13,7 @@ public class PlayerControl : MonoBehaviour {
 
     Target currentTarget = Target.Libero;
 
-    [SerializeField] CameraMoves cameraMoves;
+    //[SerializeField] CameraMoves cameraMoves;
     [SerializeField] GameObject ball;
     [SerializeField] float hitForce;
     [SerializeField] GameObject arrow;
@@ -58,7 +58,7 @@ public class PlayerControl : MonoBehaviour {
     void Start() {
         refTarget = targetLibero.position;
 
-        cameraMoves.FinalPos = targetEnemyServer.position;
+        //cameraMoves.FinalPos = targetEnemyServer.position;
 
         currentTarget = Target.Libero;
 
@@ -122,25 +122,25 @@ public class PlayerControl : MonoBehaviour {
         switch (currentTarget) {
             case Target.Libero:
                 currentTarget = Target.Setter;
-                cameraMoves.FinalPos = targetLibero.position;
+                //cameraMoves.FinalPos = targetLibero.position;
                 trajToTarget.Target = targetSetter.position;
                 break;
 
             case Target.Setter:
                 currentTarget = Target.Hitter;
-                cameraMoves.FinalPos = targetSetter.position;
+                //cameraMoves.FinalPos = targetSetter.position;
                 trajToTarget.Target = targetHitter.position;
                 break;
 
             case Target.Hitter:
                 currentTarget = Target.EnemyLibero;
-                cameraMoves.FinalPos = targetHitter.position;
+                //cameraMoves.FinalPos = targetHitter.position;
                 trajToTarget.Target = targetEnemyLibero.position;
                 break;
 
             case Target.EnemyLibero:
                 currentTarget = Target.Libero;
-                cameraMoves.FinalPos = targetEnemyLibero.position;
+                //cameraMoves.FinalPos = targetEnemyLibero.position;
                 trajToTarget.Target = targetLibero.position;
                 break;
 
@@ -210,7 +210,7 @@ public class PlayerControl : MonoBehaviour {
 
         currentTarget = Target.Libero;
         trajToTarget.Target = targetLibero.position;
-        cameraMoves.FinalPos = targetEnemyServer.position;
+        //cameraMoves.FinalPos = targetEnemyServer.position;
     }
 
     // Update is called once per frame
