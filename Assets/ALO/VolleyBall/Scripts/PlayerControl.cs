@@ -205,6 +205,8 @@ public class PlayerControl : MonoBehaviour {
         if (hitPressed) {
             ballRigidBody.useGravity = true;
             ballRigidBody.AddForce(direction * hitForce, ForceMode.Impulse);
+
+            SfxController.Singleton.PlaySpecialHitSfx(ball.transform.position);
         }
 
         hitPressed = false;

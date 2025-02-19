@@ -6,6 +6,7 @@ public class SfxController : MonoBehaviour {
     [SerializeField] AudioClip[] SetSfx;
     [SerializeField] AudioClip[] SpikeSfx;
     [SerializeField] AudioClip[] BounceFloorSfx;
+    [SerializeField] AudioClip[] SpecialHitSfx;
 
 
     // Make it Singleton:
@@ -57,4 +58,12 @@ public class SfxController : MonoBehaviour {
         AudioSource.PlayClipAtPoint(BounceFloorSfx[Random.Range(0, BounceFloorSfx.Length)], position);
     }
 
+    // Play a random clip from the SpecialHitSfx array at the given position:
+    public void PlaySpecialHitSfx(Vector3 position) {
+        if (SpecialHitSfx.Length == 0) {
+            Debug.LogWarning(this + ": No SpecialHitSfx clips found...");
+            return;
+        }
+        AudioSource.PlayClipAtPoint(SpecialHitSfx[Random.Range(0, SpecialHitSfx.Length)], position);
+    }
 }
